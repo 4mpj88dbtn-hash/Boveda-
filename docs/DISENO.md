@@ -52,7 +52,7 @@ Botón de latón con texto grafito: 6.84:1 ✅.
 
 **Números tabulares verificados** (revisando los archivos de las fuentes el 05/11/2026):
 
-- Cormorant Garamond incluye números tabulares (`tnum`) y de altura uniforme (`lnum`). Sus cifras por defecto no son tabulares, así que todas las cifras usan `font-variant-numeric: lining-nums tabular-nums`.
+- Cormorant Garamond incluye números tabulares (`tnum`) y de altura uniforme (`lnum`). Sus cifras por defecto son proporcionales y de estilo antiguo (en una prueba visual, el "0" de "Fase 0" parecía una "o"). Por eso los montos usan `font-variant-numeric: lining-nums tabular-nums` y todo título en serif usa al menos `lining-nums`.
 - IBM Plex Sans ya trae cifras tabulares por defecto (todas miden lo mismo).
 - Alternativa evaluada: Bodoni Moda + Geist (ambas tienen `tnum`). Bodoni Moda se siente más de revista de moda y Geist más de startup; para "banca privada + sala de control" recomiendo Cormorant + Plex.
 

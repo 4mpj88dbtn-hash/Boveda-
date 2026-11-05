@@ -73,6 +73,7 @@ Antes de instalar o actualizar una dependencia, revisa su versión vigente (`npm
 - Concepto: banca privada de día, centro de mando de noche. Poderoso, discreto, exacto; nada caricaturesco. Es solo inspiración de estilo: sin logotipos, murciélagos, nombres ni recursos de DC/Warner.
 - Modo oscuro por defecto. Usa solo los tokens definidos; no agregues colores sueltos.
 - Serif (Cormorant Garamond) para cifras grandes y títulos; grotesca (IBM Plex Sans) para la interfaz. Fuentes auto-alojadas.
+- Las cifras por defecto de Cormorant son de estilo antiguo (el "0" parece una "o"): todo texto en serif lleva `lining-nums`, y los montos además `tabular-nums`.
 - Un solo elemento memorable: el encabezado del Centro de mando (patrimonio neto sobre una retícula técnica tenue que reacciona al cursor o al toque). Todo lo demás, sobrio.
 - Evita: texto todo en mayúsculas, etiquetas decorativas sobre cada título, tarjetas idénticas con la misma sombra gris, gradientes de adorno y animaciones de entrada en cada sección.
 - El movimiento solo responde a acciones (guardar un gasto, abrir un detalle), más una única secuencia de carga en el Centro de mando. Respeta `prefers-reduced-motion`.
