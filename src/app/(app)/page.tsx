@@ -1,19 +1,16 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { Amount } from "@/components/ui/amount";
 import { EducationalNotice, EmptyState, PhaseTag } from "@/components/ui/notices";
 import { Panel } from "@/components/ui/panel";
 import { CommandHeader } from "@/modules/command-center/command-header";
-import { Greeting, GreetingFallback } from "@/modules/command-center/greeting";
+import { Greeting } from "@/modules/command-center/greeting";
 
 export const metadata: Metadata = { title: "Centro de mando" };
 
 export default function CommandCenterPage() {
   return (
     <>
-      <Suspense fallback={<GreetingFallback />}>
-        <Greeting />
-      </Suspense>
+      <Greeting />
 
       <CommandHeader netWorthCents={null} />
 
