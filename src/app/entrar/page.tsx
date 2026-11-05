@@ -14,7 +14,8 @@ export default function SignInPage() {
       </header>
       <SignInForm />
       <p className="text-nota text-texto-2">
-        ¿Olvidaste tu contraseña? Cámbiala en Supabase, en Authentication → Users. Los pasos están en el README.
+        ¿Olvidaste tu contraseña? Se cambia desde el panel de Supabase; los pasos están en el README, en
+        “Si algo sale mal”.
       </p>
     </div>
   );
