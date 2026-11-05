@@ -27,13 +27,38 @@ describe("base de datos", () => {
 
     const db = new BovedaDatabase("prueba-migracion");
     await db.open();
-    expect(db.verno).toBe(2);
+    expect(db.verno).toBe(3);
     expect(await db.settings.toArray()).toEqual([
       { key: "displayName", value: "Ana" },
       { key: "lockPolicy", value: "siempre" },
     ]);
     expect(await db.categories.count()).toBe(DEFAULT_CATEGORIES.length);
     expect(await db.accounts.count()).toBe(1);
+    expect(await db.budgets.count()).toBe(0);
+    db.close();
+  });
+
+  it("al actualizar desde la parte 1 de Finanzas conserva cuentas y movimientos", async () => {
+    // Base tal como la dejó la Fase 1, parte 1 (versión 2).
+    const v2 = new Dexie("prueba-v2");
+    v2.version(1).stores({ settings: "key" });
+    v2.version(2).stores({
+      settings: "key",
+      accounts: "id, order",
+      categories: "id, type, order",
+      transactions: "id, date, type, categoryId, accountId, toAccountId, createdAt",
+    });
+    await v2.open();
+    await v2.table("transactions").put({ id: "t1", date: "2026-11-05", amountCents: 25_000 });
+    await v2.table("accounts").put({ id: "banco", order: 3 });
+    v2.close();
+
+    const db = new BovedaDatabase("prueba-v2");
+    await db.open();
+    expect(db.verno).toBe(3);
+    expect(await db.transactions.get("t1")).toMatchObject({ amountCents: 25_000 });
+    expect(await db.accounts.get("banco")).toMatchObject({ order: 3 });
+    expect(await db.recurring.count()).toBe(0);
     db.close();
   });
 });

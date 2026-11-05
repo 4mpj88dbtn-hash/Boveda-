@@ -25,6 +25,22 @@ const settingSchemas = {
     date: z.string().regex(ISO_DATE_PATTERN),
     source: z.string().min(1).max(60),
   }),
+  /** Plantilla 50/30/20: ingreso base (null = tu promedio real) y porcentajes. */
+  budgetRule: z
+    .object({
+      incomeCents: z.number().int().positive().nullable(),
+      needs: z.number().int().min(0).max(100),
+      wants: z.number().int().min(0).max(100),
+      savings: z.number().int().min(0).max(100),
+    })
+    .refine((rule) => rule.needs + rule.wants + rule.savings === 100),
+  /** Último resumen que abriste: inicio de la semana y mes ("aaaa-mm"). */
+  summariesSeen: z.object({
+    weekly: z.string().regex(ISO_DATE_PATTERN).nullable(),
+    monthly: z.string().regex(/^\d{4}-\d{2}$/).nullable(),
+  }),
+  /** Hasta cuándo no mostrar el recordatorio de respaldo. */
+  backupReminderSnoozedUntil: z.number(),
 } as const;
 
 export type SettingKey = keyof typeof settingSchemas;

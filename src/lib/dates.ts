@@ -102,3 +102,17 @@ export function formatDayHeading(date: IsoDate, today: IsoDate): string {
   if (date === addDaysToIsoDate(today, -1)) return "Ayer";
   return `${format(parseIsoDate(date), "EEEE", { locale: es })} ${formatDate(date)}`;
 }
+
+/** El instante en que en Cancún es `date` a esa hora (por ejemplo, domingo a las 20:00). */
+export function cancunInstant(date: IsoDate, hour: number, minute = 0): Date {
+  const day = parseIsoDate(date);
+  const instant = new TZDate(day.getFullYear(), day.getMonth(), day.getDate(), hour, minute, 0, APP_TIME_ZONE);
+  return new Date(instant.getTime());
+}
+
+/** Días de calendario de `start` a `end`, contando ambos. */
+export function daysBetweenInclusive(start: IsoDate, end: IsoDate): number {
+  if (end < start) return 0;
+  const [a, b] = [start, end].map((date) => Date.UTC(...(date.split("-").map(Number) as [number, number, number])));
+  return Math.round(((b ?? 0) - (a ?? 0)) / 86_400_000) + 1;
+}

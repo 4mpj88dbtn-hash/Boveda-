@@ -1,5 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
+  cancunInstant,
+  daysBetweenInclusive,
   addDaysToIsoDate,
   formatDayHeading,
   formatMonth,
@@ -104,5 +106,18 @@ describe("meses y días del historial", () => {
     // 1 de noviembre de 2026 fue domingo.
     expect(formatDayHeading("2026-11-01", "2026-11-05")).toBe("domingo 01/11/2026");
     expect(addDaysToIsoDate("2026-12-31", 1)).toBe("2027-01-01");
+  });
+});
+
+describe("cancunInstant y daysBetweenInclusive", () => {
+  it("el domingo 8 de noviembre a las 20:00 en Cancún es el lunes 9 a la 01:00 UTC", () => {
+    expect(cancunInstant("2026-11-08", 20).toISOString()).toBe("2026-11-09T01:00:00.000Z");
+    expect(cancunInstant("2026-12-01", 9).toISOString()).toBe("2026-12-01T14:00:00.000Z");
+  });
+
+  it("cuenta días de calendario incluyendo ambos extremos", () => {
+    expect(daysBetweenInclusive("2026-11-01", "2026-11-30")).toBe(30);
+    expect(daysBetweenInclusive("2026-12-31", "2027-01-01")).toBe(2);
+    expect(daysBetweenInclusive("2026-11-05", "2026-11-04")).toBe(0);
   });
 });

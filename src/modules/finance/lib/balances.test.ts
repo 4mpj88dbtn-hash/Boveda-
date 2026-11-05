@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { accountBalances, amountInMxn, netWorth } from "./balances";
+import { accountBalances, amountInMxn, monthlyNetWorth, netWorth } from "./balances";
 import { account, movement } from "./test-data";
 
 /*
@@ -74,5 +74,22 @@ describe("amountInMxn", () => {
 
   it("no inventa un tipo de cambio si falta", () => {
     expect(() => amountInMxn({ amountCents: 100, currency: "USD", fxRate: null })).toThrow(RangeError);
+  });
+});
+
+describe("monthlyNetWorth", () => {
+  it("da el patrimonio al cierre de cada mes con los movimientos hasta ese día", () => {
+    // Banco empieza con 100,000. Octubre: +50,000 (día 10). Noviembre: −20,000 (día 3) y −5,000 (día 30).
+    const bank = [account({ id: "banco", openingBalanceCents: 100_000 })];
+    const moves = [
+      movement({ type: "ingreso", amountCents: 50_000, accountId: "banco", date: "2026-10-10" }),
+      movement({ type: "gasto", amountCents: 20_000, accountId: "banco", date: "2026-11-03" }),
+      movement({ type: "gasto", amountCents: 5_000, accountId: "banco", date: "2026-11-30" }),
+    ];
+    expect(monthlyNetWorth(bank, moves, null, ["2026-09", "2026-10", "2026-11"])).toEqual([
+      { month: "2026-09", cents: 100_000 },
+      { month: "2026-10", cents: 150_000 },
+      { month: "2026-11", cents: 125_000 },
+    ]);
   });
 });

@@ -78,3 +78,32 @@ export function netWorth(accounts: Account[], balances: Map<string, number>, usd
   }
   return result;
 }
+
+/** Patrimonio neto al cierre de un día: cuenta solo los movimientos hasta esa fecha. */
+export function netWorthAt(
+  accounts: Account[],
+  transactions: (Movement & Pick<Transaction, "date">)[],
+  date: string,
+  usdRate: string | null,
+): NetWorth {
+  const until = transactions.filter((transaction) => transaction.date <= date);
+  return netWorth(accounts, accountBalances(accounts, until), usdRate);
+}
+
+/**
+ * Patrimonio al cierre de cada mes ("aaaa-mm"). Los saldos iniciales cuentan desde siempre y
+ * las cuentas en dólares usan el tipo de cambio de hoy, así que la gráfica muestra cómo se
+ * movió tu dinero por tus movimientos, no por el tipo de cambio.
+ */
+export function monthlyNetWorth(
+  accounts: Account[],
+  transactions: (Movement & Pick<Transaction, "date">)[],
+  usdRate: string | null,
+  months: string[],
+): { month: string; cents: number }[] {
+  return months.map((month) => {
+    const [year = 0, monthNumber = 1] = month.split("-").map(Number);
+    const lastDay = new Date(Date.UTC(year, monthNumber, 0)).getUTCDate();
+    return { month, cents: netWorthAt(accounts, transactions, `${month}-${String(lastDay).padStart(2, "0")}`, usdRate).totalCents };
+  });
+}

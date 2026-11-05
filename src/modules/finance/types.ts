@@ -109,3 +109,83 @@ export const transactionSchema = z.object({
   updatedAt: z.number(),
 });
 export type Transaction = z.infer<typeof transactionSchema>;
+
+/* ---------- Fase 1, parte 2 ---------- */
+
+export const FREQUENCIES = ["semanal", "catorcenal", "quincenal", "mensual", "anual"] as const;
+export type Frequency = (typeof FREQUENCIES)[number];
+
+export const FREQUENCY_LABELS: Record<Frequency, string> = {
+  semanal: "Cada semana",
+  catorcenal: "Cada 2 semanas",
+  quincenal: "Cada quincena (día 15 y último día)",
+  mensual: "Cada mes",
+  anual: "Cada año",
+};
+
+export const RECURRING_MODES = ["automatico", "confirmar"] as const;
+export type RecurringMode = (typeof RECURRING_MODES)[number];
+
+export const RECURRING_MODE_LABELS: Record<RecurringMode, string> = {
+  automatico: "Registrarlo solo",
+  confirmar: "Pedirme confirmación",
+};
+
+/** Lo que se repite de un movimiento: todo menos su id y su fecha. */
+export const movementTemplateSchema = transactionSchema.omit({ id: true, date: true, createdAt: true, updatedAt: true });
+export type MovementTemplate = z.infer<typeof movementTemplateSchema>;
+
+export const recurringSchema = z.object({
+  id,
+  frequency: z.enum(FREQUENCIES),
+  /** Primera fecha: de ella salen el día del mes o de la semana. */
+  startDate: isoDate,
+  /** Siguiente fecha que falta registrar. */
+  nextDate: isoDate,
+  mode: z.enum(RECURRING_MODES),
+  active: z.boolean(),
+  template: movementTemplateSchema,
+  createdAt: z.number(),
+});
+export type Recurring = z.infer<typeof recurringSchema>;
+
+/** Presupuesto mensual de una categoría, en pesos. Uno por categoría. */
+export const budgetSchema = z.object({
+  categoryId: id,
+  amountCents: cents.positive(),
+  createdAt: z.number(),
+  updatedAt: z.number(),
+});
+export type Budget = z.infer<typeof budgetSchema>;
+
+/** Plantilla de un movimiento frecuente; el monto es opcional. */
+export const templateSchema = z.object({
+  id,
+  name: z.string().trim().min(1).max(30),
+  type: z.enum(TRANSACTION_TYPES),
+  amountCents: cents.positive().nullable(),
+  currency: z.enum(CURRENCIES),
+  categoryId: id.nullable(),
+  accountId: id.nullable(),
+  toAccountId: id.nullable(),
+  paymentMethod: z.enum(PAYMENT_METHODS).nullable(),
+  note: z.string().max(280),
+  tags: z.array(z.string().min(1).max(30)).max(10),
+  order: z.number().int(),
+  createdAt: z.number(),
+});
+export type Template = z.infer<typeof templateSchema>;
+
+export const ATTACHMENT_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
+
+/** Foto del ticket de un movimiento, guardada en el dispositivo. */
+export const attachmentSchema = z.object({
+  id,
+  transactionId: id,
+  mimeType: z.enum(ATTACHMENT_TYPES),
+  data: z.instanceof(ArrayBuffer),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  createdAt: z.number(),
+});
+export type Attachment = z.infer<typeof attachmentSchema>;

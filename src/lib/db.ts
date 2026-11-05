@@ -1,6 +1,14 @@
 import Dexie, { type EntityTable, type Transaction as DexieTransaction } from "dexie";
 import { DEFAULT_CATEGORIES, defaultAccounts } from "@/modules/finance/defaults";
-import type { Account, Category, Transaction } from "@/modules/finance/types";
+import type {
+  Account,
+  Attachment,
+  Budget,
+  Category,
+  Recurring,
+  Template,
+  Transaction,
+} from "@/modules/finance/types";
 import type { SettingRow } from "./backup";
 
 /**
@@ -14,6 +22,10 @@ export class BovedaDatabase extends Dexie {
   accounts!: EntityTable<Account, "id">;
   categories!: EntityTable<Category, "id">;
   transactions!: EntityTable<Transaction, "id">;
+  budgets!: EntityTable<Budget, "categoryId">;
+  recurring!: EntityTable<Recurring, "id">;
+  templates!: EntityTable<Template, "id">;
+  attachments!: EntityTable<Attachment, "id">;
 
   constructor(name = "boveda") {
     super(name);
@@ -28,6 +40,17 @@ export class BovedaDatabase extends Dexie {
         transactions: "id, date, type, categoryId, accountId, toAccountId, createdAt",
       })
       .upgrade(seedFinance);
+    // Fase 1, parte 2: presupuestos, recurrentes, plantillas y fotos de tickets (tablas nuevas, vacías).
+    this.version(3).stores({
+      settings: "key",
+      accounts: "id, order",
+      categories: "id, type, order",
+      transactions: "id, date, type, categoryId, accountId, toAccountId, createdAt",
+      budgets: "categoryId",
+      recurring: "id, nextDate",
+      templates: "id, order",
+      attachments: "id, transactionId",
+    });
     // Base nueva: se crea directo en la última versión y aquí recibe lo inicial.
     this.on("populate", seedFinance);
   }
