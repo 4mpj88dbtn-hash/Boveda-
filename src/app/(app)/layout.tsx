@@ -1,6 +1,8 @@
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { MobileTopBar } from "@/components/layout/mobile-top-bar";
 import { Sidebar } from "@/components/layout/sidebar";
+import { Toaster } from "@/components/ui/toast";
+import { TransactionSheetHost } from "@/modules/finance/transaction-sheet";
 import { LockGate } from "@/modules/lock/lock-gate";
 
 /**
@@ -20,6 +22,8 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
         </div>
         <BottomNav />
       </div>
+      <TransactionSheetHost />
+      <Toaster />
     </LockGate>
   );
 }

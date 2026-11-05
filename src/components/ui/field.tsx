@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,24 @@ export function Input({ className, ...props }: ComponentProps<"input">) {
       )}
       {...props}
     />
+  );
+}
+
+/** Lista desplegable nativa con el mismo estilo que los campos. */
+export function Select({ className, children, ...props }: ComponentProps<"select">) {
+  return (
+    <div className={cn("relative min-w-0", className)}>
+      <select
+        className={cn(
+          "h-11 w-full appearance-none truncate rounded-control border border-borde-control bg-fondo pl-3 pr-9 text-cuerpo text-texto",
+          "transition-colors duration-120 ease-boveda focus-visible:border-laton focus-visible:outline-offset-0",
+        )}
+        {...props}
+      >
+        {children}
+      </select>
+      <ChevronDown aria-hidden className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-texto-2" />
+    </div>
   );
 }
 
