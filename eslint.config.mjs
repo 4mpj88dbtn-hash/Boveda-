@@ -18,6 +18,8 @@ const eslintConfig = defineConfig([
     "public/**",
     "playwright-report/**",
     "test-results/**",
+    // Generado por `npm run db:types`.
+    "src/lib/supabase/database.types.ts",
   ]),
 ]);
 
