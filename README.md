@@ -1,2 +1,93 @@
-# Boveda-
-Finanzas personales 
+# Bóveda
+
+App personal de finanzas, inversión y mercados, instalable en celular y computadora. Funciona **sin servidor**: tus datos viven solo en tu dispositivo y la app se publica gratis en GitHub Pages.
+
+> Información educativa. No es asesoría financiera.
+
+**Dirección:** https://4mpj88dbtn-hash.github.io/Boveda-/
+
+**Estado:** Fase 0 lista para probar: diseño, navegación, PIN, respaldos, instalación y modo sin internet. Las secciones muestran qué llega en cada fase. El avance está en [`ROADMAP.md`](ROADMAP.md).
+
+## Activar la publicación (una sola vez)
+
+Lo haces tú en GitHub, porque son ajustes de tu cuenta:
+
+1. **Hacer público el repositorio:** en GitHub abre `Boveda-` → **Settings** → baja hasta **Danger Zone** → **Change repository visibility** → **Make public** y confirma. Se ve el código; nunca tus datos, que viven en tu dispositivo.
+2. **Activar GitHub Pages:** **Settings** → **Pages** → en **Build and deployment**, **Source: Deploy from a branch** → rama **`gh-pages`**, carpeta **`/ (root)`** → **Save**.
+3. Espera uno o dos minutos y abre la dirección de arriba.
+
+Desde ese momento, cada avance que se suba a GitHub se revisa y se publica solo en esa dirección.
+
+## Usar la app
+
+1. Abre la dirección en tu celular.
+2. Escribe cómo quieres que te salude y crea un PIN de 6 dígitos que solo tú sepas.
+3. Instálala:
+   - **iPhone:** Safari → Compartir → **Agregar a inicio**.
+   - **Android:** Chrome → menú ⋮ → **Instalar app**.
+4. Desde ahí ábrela con su ícono. Funciona sin internet.
+
+### Respaldos
+
+Tus datos existen solo en ese dispositivo. Si lo pierdes o se borran los datos del navegador, solo los recuperas con un respaldo.
+
+- **Ajustes → Descargar respaldo.** En el celular se abre el menú de compartir: guárdalo en Archivos, iCloud o Drive. Hazlo cada semana.
+- **Ajustes → Restaurar respaldo** reemplaza los datos actuales por los del archivo. El respaldo nunca incluye tu PIN.
+- Para usar la app en otro dispositivo: descarga un respaldo en uno y restáuralo en el otro.
+
+### Si algo sale mal
+
+- **Olvidé mi PIN.** No se puede recuperar porque solo existe en tu dispositivo. En la pantalla del PIN toca **¿Olvidaste tu PIN?**, borra todo, crea un PIN nuevo y restaura tu último respaldo.
+- **Me equivoqué de PIN varias veces.** Después de 5 intentos la app te hace esperar 30 segundos, y el doble cada vez, hasta 15 minutos.
+- **La dirección muestra un error 404.** Revisa que GitHub Pages esté activo con la rama `gh-pages` (paso 2 de arriba).
+
+## Qué claves necesita
+
+Ninguna por ahora. Desde la Fase 2 (precios de mercado) se guardarán claves de las APIs en **Settings → Secrets and variables → Actions** del repositorio; nunca en el código, porque el repositorio es público.
+
+## Correrla en tu computadora
+
+Necesitas [Node.js 22](https://nodejs.org).
+
+```bash
+npm install          # instala las dependencias (una vez)
+npm run dev          # modo desarrollo: http://localhost:3000/Boveda-/
+```
+
+Para probar la versión compilada, igual que en GitHub Pages:
+
+```bash
+npm run build        # compila a la carpeta out/
+npm start            # la sirve en http://localhost:3000/Boveda-/
+```
+
+## Comandos
+
+| Comando | Qué hace |
+|---|---|
+| `npm run dev` | App en modo desarrollo |
+| `npm run build` / `npm start` | Compila y sirve la versión publicada |
+| `npm run check` | Estilo, tipos y pruebas unitarias |
+| `npm test` | Pruebas unitarias (dinero, fechas, PIN, bloqueo y respaldos) |
+| `npm run test:e2e` | Flujo completo en un navegador: bienvenida, PIN, ajustes, respaldo y modo sin internet |
+
+## Cómo está organizado
+
+```
+src/app/            pantallas (las direcciones van en español: /finanzas/, /mercados/…)
+src/modules/        lógica por área: bloqueo con PIN, ajustes, Centro de mando
+src/components/     componentes de interfaz y navegación
+src/lib/            dinero, fechas, base de datos local, PIN, respaldos
+public/sw.js        service worker (instalación y modo sin internet)
+scripts/            preparación del service worker y servidor local
+tests/e2e/          pruebas de flujo completo
+docs/               requisitos, arquitectura y diseño
+```
+
+## Seguridad
+
+- La app se abre con un PIN; mientras está bloqueada no muestra ningún dato.
+- El PIN nunca se guarda: solo una huella PBKDF2-SHA256 de 600,000 vueltas con sal aleatoria.
+- Tus datos no salen de tu dispositivo, salvo en el respaldo que tú descargas.
+- La página solo carga y se conecta a sus propios archivos (política de seguridad de contenido).
+- El repositorio es público: no contiene claves, datos ni respaldos.

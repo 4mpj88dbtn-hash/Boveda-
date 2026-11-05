@@ -1,0 +1,47 @@
+{
+  "name": "boveda",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build && node scripts/precache.mjs",
+    "start": "node scripts/servir.mjs",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "check": "npm run lint && npm run typecheck && npm run test"
+  },
+  "dependencies": {
+    "@date-fns/tz": "^1.5.0",
+    "big.js": "^7.0.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
+    "dexie": "^4.4.7",
+    "dexie-react-hooks": "^4.4.0",
+    "lucide-react": "^1.69.0",
+    "next": "16.4.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@tailwindcss/turbopack": "^4",
+    "@types/big.js": "^7.0.0",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.5",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
