@@ -34,7 +34,7 @@ App web personal (PWA instalable en celular y computadora) para manejar finanzas
 
 | Capa | Herramienta |
 |---|---|
-| Frontend | Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS 4 + shadcn/ui |
+| Frontend | Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS 4. Componentes base propios al estilo de shadcn/ui (`class-variance-authority`, `tailwind-merge`, íconos Lucide) en `src/components/ui` |
 | PWA y modo sin conexión | Service worker propio (`public/sw.js`) + IndexedDB con Dexie en la Fase 1 (cola de movimientos que se sincroniza después) |
 | Datos y autenticación | Supabase: Postgres, Auth con 2FA, Row Level Security, Storage y Cron |
 | Lógica de servidor | Route Handlers y Server Actions de Next.js en Vercel; las tareas programadas las dispara Supabase Cron |
