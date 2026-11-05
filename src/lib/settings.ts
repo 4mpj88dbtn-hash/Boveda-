@@ -3,6 +3,7 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { z } from "zod";
 import { getDb } from "./db";
+import { ISO_DATE_PATTERN, RATE_PATTERN } from "@/modules/finance/types";
 import { LOCK_POLICIES } from "./lock/policy";
 
 /** Ajustes guardados en el celular, cada uno validado al leerlo. */
@@ -18,6 +19,12 @@ const settingSchemas = {
   pinFailures: z.object({ count: z.number().int().min(0), lastAt: z.number() }),
   createdAt: z.number(),
   lastBackupAt: z.number(),
+  /** Último tipo de cambio que escribiste: pesos por 1 dólar, con su fecha y su fuente. */
+  usdMxnRate: z.object({
+    rate: z.string().regex(RATE_PATTERN),
+    date: z.string().regex(ISO_DATE_PATTERN),
+    source: z.string().min(1).max(60),
+  }),
 } as const;
 
 export type SettingKey = keyof typeof settingSchemas;
