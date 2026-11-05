@@ -30,7 +30,8 @@ export default defineConfig({
   webServer: {
     command: `npm run build && npm run start -- --port ${PORT}`,
     url: `http://localhost:${PORT}/entrar`,
-    reuseExistingServer: !process.env.CI,
+    // Siempre compila y arranca un servidor nuevo: así se prueba exactamente lo que hay en el código.
+    reuseExistingServer: false,
     timeout: 240_000,
   },
 });
