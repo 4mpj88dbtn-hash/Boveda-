@@ -1,26 +1,177 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Tokens de Bóveda. Detalle, contraste y razones en docs/DISENO.md.
+ * Modo oscuro por defecto. Solo existen estos colores: no agregues colores sueltos.
+ */
+@theme {
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-fondo: #0d0f12;
+  --color-superficie: #161a1f;
+  --color-elevada: #1f242b;
+  --color-borde: #2b3139;
+  --color-borde-control: #6a727d;
+  --color-texto: #ece8e1;
+  --color-texto-2: #8c939c;
+  --color-laton: #b8955a;
+  --color-acero: #4e8cc2;
+  --color-positivo: #3daa82;
+  --color-negativo: #d9454b;
+  --color-negativo-texto: #e5676b;
+  --color-sobre-laton: #0d0f12;
+  --color-reticula: rgb(78 140 194 / 0.08);
+  --color-reticula-viva: rgb(184 149 90 / 0.32);
+  --color-mira: rgb(184 149 90 / 0.5);
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-*: initial;
+  --font-serif: var(--font-cormorant), "Cormorant Garamond", "Times New Roman", serif;
+  --font-sans: var(--font-plex), "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --text-*: initial;
+  --text-hero: 2.75rem;
+  --text-hero--line-height: 1;
+  --text-hero-lg: 4rem;
+  --text-hero-lg--line-height: 1;
+  --text-display: 1.875rem;
+  --text-display--line-height: 1.1;
+  --text-display-lg: 2.25rem;
+  --text-display-lg--line-height: 1.1;
+  --text-titulo: 1.375rem;
+  --text-titulo--line-height: 1.2;
+  --text-titulo-lg: 1.5rem;
+  --text-titulo-lg--line-height: 1.2;
+  --text-cifra: 1.5rem;
+  --text-cifra--line-height: 1.1;
+  --text-cifra-lg: 1.75rem;
+  --text-cifra-lg--line-height: 1.1;
+  --text-cuerpo: 1rem;
+  --text-cuerpo--line-height: 1.5;
+  --text-interfaz: 0.9375rem;
+  --text-interfaz--line-height: 1.4;
+  --text-etiqueta: 0.8125rem;
+  --text-etiqueta--line-height: 1.3;
+  --text-nota: 0.75rem;
+  --text-nota--line-height: 1.35;
+
+  --radius-*: initial;
+  --radius-control: 4px;
+  --radius-tarjeta: 8px;
+  --radius-hoja: 16px;
+  --radius-full: 9999px;
+
+  --shadow-*: initial;
+  --shadow-flotante: 0 18px 40px -12px rgb(0 0 0 / 0.7), 0 2px 6px rgb(0 0 0 / 0.45);
+
+  --ease-boveda: cubic-bezier(0.2, 0, 0, 1);
+
+  --animate-encender-reticula: encender-reticula 700ms var(--ease-boveda) both;
+  --animate-enfocar-cifra: enfocar-cifra 700ms var(--ease-boveda) both;
+
+  @keyframes encender-reticula {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes enfocar-cifra {
+    from {
+      filter: blur(6px);
+      opacity: 0.55;
+    }
+    to {
+      filter: blur(0);
+      opacity: 1;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  html {
+    background-color: var(--color-fondo);
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    font-family: var(--font-sans);
+    font-size: var(--text-cuerpo);
+    line-height: var(--text-cuerpo--line-height);
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Las cifras por defecto de Cormorant son de estilo antiguo: el "0" parece una "o". */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-variant-numeric: lining-nums;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-laton);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: rgb(184 149 90 / 0.35);
+    color: var(--color-texto);
+  }
+}
+
+/* Solo en la primera visita de la sesión (ver src/modules/command-center/load-sequence.ts). */
+@custom-variant primera-carga (:root:not([data-secuencia-vista]) &);
+
+/* Montos: cifras de altura uniforme y del mismo ancho para que se alineen. */
+@utility cifras {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* Retícula técnica del Centro de mando (el único elemento memorable). */
+@utility reticula {
+  background-image:
+    linear-gradient(to right, var(--color-reticula) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-reticula) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: -1px -1px;
+}
+
+@utility reticula-viva {
+  background-image:
+    linear-gradient(to right, var(--color-reticula-viva) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-reticula-viva) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: -1px -1px;
+  -webkit-mask-image: radial-gradient(160px circle at var(--x, 50%) var(--y, 40%), #000 0%, transparent 72%);
+  mask-image: radial-gradient(160px circle at var(--x, 50%) var(--y, 40%), #000 0%, transparent 72%);
+}
+
+@utility mira {
+  background:
+    linear-gradient(var(--color-mira), var(--color-mira)) center / 1px 100% no-repeat,
+    linear-gradient(var(--color-mira), var(--color-mira)) center / 100% 1px no-repeat;
+}
+
+/* Respeta "reducir movimiento": todo aparece al instante. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
