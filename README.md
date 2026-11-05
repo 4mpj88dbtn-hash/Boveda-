@@ -6,7 +6,7 @@ App personal de finanzas, inversión y mercados, instalable en celular y computa
 
 **Dirección:** https://4mpj88dbtn-hash.github.io/Boveda-/
 
-**Estado:** Fase 0 lista para probar: diseño, navegación, PIN, respaldos, instalación y modo sin internet. Las secciones muestran qué llega en cada fase. El avance está en [`ROADMAP.md`](ROADMAP.md).
+**Estado:** Fase 1, parte 1 lista para probar: registrar gastos e ingresos, cuentas, transferencias, historial y el Centro de mando con tus números. Las demás secciones muestran qué llega en cada fase. El avance está en [`ROADMAP.md`](ROADMAP.md).
 
 ## Activar la publicación (una sola vez)
 
@@ -27,11 +27,23 @@ Desde ese momento, cada avance que se suba a GitHub se revisa y se publica solo 
    - **Android:** Chrome → menú ⋮ → **Instalar app**.
 4. Desde ahí ábrela con su ícono. Funciona sin internet.
 
+### Registrar un gasto o un ingreso
+
+1. Toca el botón **+**.
+2. Escribe el monto con el teclado de la pantalla y toca la categoría.
+3. Toca **Guardar gasto**. Si te equivocaste, toca **Deshacer** en el aviso de abajo.
+
+- Arriba eliges **Gasto**, **Ingreso** o **Transferencia** (mover dinero entre tus cuentas, por ejemplo pagar la tarjeta).
+- **Repetir último** llena todo igual que tu último movimiento.
+- Para pagos en dólares toca **USD** y escribe el tipo de cambio del día: cuántos pesos vale 1 dólar. La app lo recuerda para la próxima vez.
+- **Más detalles** agrega nota, método de pago y etiquetas.
+- En **Finanzas** ves el historial del mes, buscas, filtras y tocas un movimiento para corregirlo o eliminarlo. En **Cuentas** agregas tus bancos y tarjetas con su saldo de hoy.
+
 ### Respaldos
 
 Tus datos existen solo en ese dispositivo. Si lo pierdes o se borran los datos del navegador, solo los recuperas con un respaldo.
 
-- **Ajustes → Descargar respaldo.** En el celular se abre el menú de compartir: guárdalo en Archivos, iCloud o Drive. Hazlo cada semana.
+- **Ajustes → Descargar respaldo.** Incluye tus cuentas, categorías y movimientos. En el celular se abre el menú de compartir: guárdalo en Archivos, iCloud o Drive. Hazlo cada semana.
 - **Ajustes → Restaurar respaldo** reemplaza los datos actuales por los del archivo. El respaldo nunca incluye tu PIN.
 - Para usar la app en otro dispositivo: descarga un respaldo en uno y restáuralo en el otro.
 
@@ -68,14 +80,14 @@ npm start            # la sirve en http://localhost:3000/Boveda-/
 | `npm run dev` | App en modo desarrollo |
 | `npm run build` / `npm start` | Compila y sirve la versión publicada |
 | `npm run check` | Estilo, tipos y pruebas unitarias |
-| `npm test` | Pruebas unitarias (dinero, fechas, PIN, bloqueo y respaldos) |
-| `npm run test:e2e` | Flujo completo en un navegador: bienvenida, PIN, ajustes, respaldo y modo sin internet |
+| `npm test` | Pruebas unitarias (dinero, fechas, PIN, bloqueo, respaldos, saldos, totales y base de datos) |
+| `npm run test:e2e` | Flujo completo en un navegador: bienvenida, PIN, registrar, editar, cuentas, respaldo y modo sin internet |
 
 ## Cómo está organizado
 
 ```
 src/app/            pantallas (las direcciones van en español: /finanzas/, /mercados/…)
-src/modules/        lógica por área: bloqueo con PIN, ajustes, Centro de mando
+src/modules/        lógica por área: bloqueo con PIN, ajustes, Centro de mando, finanzas
 src/components/     componentes de interfaz y navegación
 src/lib/            dinero, fechas, base de datos local, PIN, respaldos
 public/sw.js        service worker (instalación y modo sin internet)

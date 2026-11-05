@@ -46,7 +46,9 @@ Una app web instalable que guarda todo en tu dispositivo (IndexedDB), protegida 
 ## 4. Tus datos
 
 - Viven solo en el navegador del dispositivo donde usas la app. No hay copia en ningún servidor.
-- **Respaldos:** Ajustes → Descargar respaldo crea un archivo `.json` con todo (menos el PIN). En el celular abre el menú de compartir para guardarlo en Archivos, iCloud o Drive. Restaurar reemplaza los datos actuales por los del archivo.
+- Tablas (`src/lib/db.ts`): `settings` (versión 1), y desde la versión 2 `accounts`, `categories` y `transactions`. Al pasar de la versión 1 a la 2 se conservan los ajustes y se agregan las categorías y la cuenta Efectivo de inicio (prueba en `src/lib/db.test.ts`).
+- Montos en centavos enteros con su moneda; cada movimiento en dólares guarda su tipo de cambio, su fuente y su fecha. El saldo de una cuenta se calcula: saldo inicial más sus movimientos.
+- **Respaldos:** Ajustes → Descargar respaldo crea un archivo `.json` con todo (menos el PIN). Formato versión 2 desde la Fase 1; los respaldos de la Fase 0 se siguen leyendo. Antes de restaurar se revisa que cada movimiento apunte a cuentas y categorías que existan; la restauración es todo o nada. En el celular abre el menú de compartir para guardarlo en Archivos, iCloud o Drive. Restaurar reemplaza los datos actuales por los del archivo.
 - **Riesgo de pérdida:** si pierdes el dispositivo o se borran los datos del navegador, solo los recuperas con un respaldo. En iPhone, Safari borra los datos de sitios que no abres en 7 días; las apps agregadas a la pantalla de inicio llevan su propia cuenta de días, pero hay reportes de borrados. Por eso: instalar la app y respaldar cada semana.
 - La app pide al navegador que marque los datos como permanentes (`navigator.storage.persist()`) y muestra en Ajustes si lo concedió.
 - **Sincronización:** no hay. Cada dispositivo tiene sus propios datos; para pasar datos de uno a otro se usa un respaldo.

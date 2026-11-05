@@ -8,8 +8,8 @@ Estado: ⬜ pendiente · 🟨 en curso · ✅ aprobada
 
 | Fase | Contenido | Entregable | Estado |
 |---|---|---|---|
-| 0 — Base | Diseño, componentes base, PIN, datos en el dispositivo, respaldos, sin conexión, publicación | App vacía con el diseño, el PIN y la instalación funcionando | 🟨 |
-| 1 — Finanzas | Registro rápido, categorías, cuentas, historial, resúmenes semanal y mensual, presupuestos | Ya puedo usarla a diario | ⬜ |
+| 0 — Base | Diseño, componentes base, PIN, datos en el dispositivo, respaldos, sin conexión, publicación | App vacía con el diseño, el PIN y la instalación funcionando | ✅ |
+| 1 — Finanzas | Registro rápido, categorías, cuentas, historial, resúmenes semanal y mensual, presupuestos | Ya puedo usarla a diario | 🟨 |
 | 2 — Mercados | Watchlist, gráficas, comparador base 100, estado del mercado | Veo todos mis activos clave | ⬜ |
 | 3 — Noticias y señales | Feed, calendario económico, avisos de mercado por Telegram, alertas en la app | Me llegan avisos de mercado al celular | ⬜ |
 | 4 — Inversión S&P 500 | Portafolio, calculadoras, guía educativa, fundamentales | Controlo y entiendo mi inversión | ⬜ |
@@ -20,7 +20,7 @@ Las secciones citadas (§) se refieren a [`docs/REQUISITOS.md`](docs/REQUISITOS.
 
 ---
 
-## Fase 0 — Base 🟨
+## Fase 0 — Base ✅
 
 **Entregable:** app vacía con el diseño, el PIN y la instalación funcionando.
 
@@ -39,27 +39,39 @@ Las secciones citadas (§) se refieren a [`docs/REQUISITOS.md`](docs/REQUISITOS.
 - [x] PWA: manifiesto, íconos, instalable y abre completa sin internet
 - [x] GitHub Actions: revisión automática y publicación en GitHub Pages
 - [x] `README.md` en español
-- [ ] Hacer público el repositorio y activar GitHub Pages (los hace el usuario; pasos en el README)
-- [ ] Tu prueba y aprobación de la Fase 0
+- [ ] Hacer público el repositorio y activar GitHub Pages (los hace el usuario; pasos en el README). Al 05/11/2026 el repositorio sigue privado
+- [x] Aprobación de la Fase 0 (se fusionó a `main` el 05/11/2026)
 
 **Cómo se aprueba:** abres la dirección en tu celular, configuras tu PIN, instalas la app y ves el Centro de mando con el diseño. Luego la abres sin internet y sigue funcionando.
 
-## Fase 1 — Finanzas ⬜
+## Fase 1 — Finanzas 🟨
 
-**Entregable:** ya puedo usarla a diario.
+**Entregable:** ya puedo usarla a diario. Se entrega en dos partes.
 
-- Registro rápido (§1.1): botón "+" siempre visible; monto → categoría → guardar; fecha de hoy por defecto; máximo 3 toques y menos de 5 segundos
-- Campos completos: tipo, monto, moneda (MXN o USD con tipo de cambio), categoría, subcategoría, método de pago, cuenta, nota, foto del ticket y etiquetas. *(Sin servidor, el tipo de cambio del día se escribe a mano o se toma del último publicado por GitHub Actions cuando exista en la Fase 2.)*
-- Categorías predefinidas y editables (§1.1)
-- Cuentas (efectivo, bancos, tarjetas, inversiones, cripto, bienes), patrimonio neto y su gráfica mensual (§1.3)
-- Transferencias entre cuentas, que no cuentan como gasto ni ingreso *(propuesta)*
-- Movimientos recurrentes, "Repetir último" y plantillas
-- Historial con búsqueda, edición, eliminación y filtros
+### Parte 1 — lista para probar (05/11/2026)
+
+- [x] Registro rápido (§1.1): botón "+" siempre visible; monto → categoría → guardar; fecha de hoy por defecto; aviso con "Deshacer"
+- [x] "Repetir último" para registrar lo mismo otra vez en 2 toques
+- [x] Campos: tipo, monto, moneda (MXN o USD con el tipo de cambio que escribes, guardado con su fecha y su fuente), categoría, cuenta, fecha, método de pago, nota y etiquetas
+- [x] Categorías predefinidas y editables: nombre, ícono, archivar (§1.1)
+- [x] Cuentas (efectivo, bancos, tarjetas, inversiones, cripto, bienes y deudas) con su saldo y patrimonio neto (§1.3)
+- [x] Transferencias entre cuentas, que no cuentan como gasto ni ingreso, también entre pesos y dólares
+- [x] Historial por mes con búsqueda, filtros, edición y eliminación
+- [x] Centro de mando con tu patrimonio neto y los totales del mes
+- [x] Base de datos versión 2 con migración probada desde la Fase 0; respaldo versión 2 con todas las tablas que sigue leyendo los de la Fase 0
+- [x] Pruebas: saldos, patrimonio, conversión de moneda, totales del mes y de la semana, tasa de ahorro, variación %, validación de movimientos, teclado, migración y respaldo; flujo completo de registrar, deshacer, dólares, editar, cuentas y restaurar
+- [ ] Tu prueba y aprobación de la parte 1
+
+### Parte 2
+
 - Resúmenes semanal (desde el domingo 20:00) y mensual (desde el día 1, 9:00) en la pantalla "Resúmenes", con exportación a PDF
 - Presupuestos mensuales por categoría con alertas al 80% y 100%; plantilla 50/30/20 editable
-- Respaldo: incluir todas las tablas nuevas y recordar descargarlo cada semana
+- Movimientos recurrentes y plantillas
+- Subcategorías en el registro (la base ya las admite)
+- Foto del ticket
+- Gráfica mensual del patrimonio neto
+- Recordatorio para descargar el respaldo cada semana
 - Evaluar cifrar los movimientos con una llave derivada del PIN *(propuesta)*
-- Pruebas: balance, tasa de ahorro, variación %, conversión de moneda, cortes de semana y mes en hora de Cancún, respaldo y restauración
 
 ## Fase 2 — Mercados ⬜
 
