@@ -156,7 +156,12 @@ function BackupPanel() {
 
   async function confirmRestore() {
     if (!pending) return;
-    await restoreBackup(pending);
+    try {
+      await restoreBackup(pending);
+    } catch {
+      setStatus({ kind: "error", text: "No se pudo restaurar. Tus datos siguen como estaban." });
+      return;
+    }
     setPending(undefined);
     setStatus({ kind: "ok", text: "Respaldo restaurado." });
   }
