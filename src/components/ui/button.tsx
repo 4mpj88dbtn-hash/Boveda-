@@ -15,6 +15,8 @@ export const buttonVariants = cva(
         secundario: "border border-borde-control text-texto hover:bg-elevada",
         fantasma: "text-texto hover:bg-elevada",
         enlace: "text-laton underline underline-offset-4 hover:text-texto",
+        // Carmesí claro con texto grafito: 5.93:1, cumple AA (el carmesí base no alcanza).
+        peligro: "bg-negativo-texto text-fondo hover:brightness-110 active:brightness-95",
       },
       size: {
         md: "h-11 px-4 text-interfaz",
