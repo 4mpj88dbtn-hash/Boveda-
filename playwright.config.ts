@@ -1,15 +1,8 @@
-import { existsSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
-
-// Las pruebas usan las mismas claves locales que la app.
-if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
 const PORT = Number(process.env.PORT ?? 3100);
 
-/**
- * Pruebas de flujo completo. Requieren la base local corriendo (`npm run db:start`)
- * y un archivo `.env.local` con las claves locales (ver README).
- */
+/** Pruebas de flujo completo sobre la app compilada, servida como en GitHub Pages. */
 export default defineConfig({
   testDir: "tests/e2e",
   timeout: 60_000,
@@ -28,8 +21,9 @@ export default defineConfig({
     { name: "escritorio", use: { ...devices["Desktop Chrome"] } },
   ],
   webServer: {
-    command: `npm run build && npm run start -- --port ${PORT}`,
-    url: `http://localhost:${PORT}/entrar`,
+    command: `npm run build && node scripts/servir.mjs`,
+    env: { PORT: String(PORT) },
+    url: `http://localhost:${PORT}/Boveda-/`,
     // Siempre compila y arranca un servidor nuevo: así se prueba exactamente lo que hay en el código.
     reuseExistingServer: false,
     timeout: 240_000,
