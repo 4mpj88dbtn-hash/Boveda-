@@ -1,10 +1,12 @@
-# Revisa cada cambio: estilo, tipos, pruebas, compilación, reglas de la base y flujo completo.
-name: Revisión
+# Revisa cada cambio y, si todo pasa, publica la app en GitHub Pages (rama gh-pages).
+# La dirección es https://4mpj88dbtn-hash.github.io/Boveda-/ y siempre muestra el último avance.
+name: Revisión y publicación
 
 on:
   push:
     branches: [main, "fase-*"]
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: revision-${{ github.ref }}
@@ -38,10 +40,10 @@ jobs:
         run: npm run build
 
   flujo-completo:
-    name: Base de datos y flujo completo
+    name: Flujo completo en navegador
     needs: codigo
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -49,21 +51,39 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Levantar Supabase local
-        run: npx supabase start
-      - name: Pruebas de reglas de acceso (base de datos)
-        run: npx supabase test db
-      - name: Usar las claves de la base local
-        # Son las claves por defecto de la base local de pruebas, no las de tu proyecto.
-        run: |
-          npx supabase status -o env > supabase.env
-          valor() { grep "^$1=" supabase.env | cut -d= -f2- | tr -d '"'; }
-          {
-            echo "SUPABASE_URL=$(valor API_URL)"
-            echo "SUPABASE_PUBLISHABLE_KEY=$(valor PUBLISHABLE_KEY)"
-            echo "SUPABASE_SECRET_KEY=$(valor SECRET_KEY)"
-          } >> "$GITHUB_ENV"
       - name: Instalar el navegador de pruebas
         run: npx playwright install --with-deps chromium
       - name: Pruebas de flujo completo
         run: npm run test:e2e
+
+  publicar:
+    name: Publicar en GitHub Pages
+    needs: [codigo, flujo-completo]
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: publicar
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Subir la app a la rama gh-pages
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd out
+          touch .nojekyll
+          git init -q -b gh-pages
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Publicación de ${GITHUB_REF_NAME} (${GITHUB_SHA::7})"
+          git push -q -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
+          echo "::notice::App publicada desde ${GITHUB_REF_NAME}. Dirección: https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/"
