@@ -1,5 +1,6 @@
 import { TZDate } from "@date-fns/tz";
 import { addDays, endOfMonth, format, startOfMonth, startOfWeek } from "date-fns";
+import { es } from "date-fns/locale/es";
 
 /**
  * Fechas en Bóveda. "Hoy" siempre se calcula en la zona horaria de Cancún, sin importar
@@ -76,4 +77,28 @@ export function formatDateWithWeekday(now: Date): string {
     timeZone: APP_TIME_ZONE,
   }).format(now);
   return `${weekday} ${formatDate(todayInCancun(now))}`;
+}
+
+/** Suma (o resta) días a una fecha de calendario. */
+export function addDaysToIsoDate(date: IsoDate, days: number): IsoDate {
+  return toIsoDate(addDays(parseIsoDate(date), days));
+}
+
+/** Mes como "aaaa-mm" movido `delta` meses: ("2026-01", −1) → "2025-12". */
+export function shiftMonth(month: string, delta: number): string {
+  const [year = 0, monthNumber = 1] = month.split("-").map(Number);
+  const index = year * 12 + (monthNumber - 1) + delta;
+  return `${Math.floor(index / 12)}-${String((index % 12) + 1).padStart(2, "0")}`;
+}
+
+/** "2026-11" → "noviembre de 2026". */
+export function formatMonth(month: string): string {
+  return format(parseIsoDate(`${month}-01`), "MMMM 'de' yyyy", { locale: es });
+}
+
+/** Encabezado de un día en el historial: "Hoy", "Ayer" o "martes 03/11/2026". */
+export function formatDayHeading(date: IsoDate, today: IsoDate): string {
+  if (date === today) return "Hoy";
+  if (date === addDaysToIsoDate(today, -1)) return "Ayer";
+  return `${format(parseIsoDate(date), "EEEE", { locale: es })} ${formatDate(date)}`;
 }

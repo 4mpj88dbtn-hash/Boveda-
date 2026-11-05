@@ -1,5 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
+  addDaysToIsoDate,
+  formatDayHeading,
+  formatMonth,
+  shiftMonth,
   formatDate,
   formatDateWithWeekday,
   greetingFor,
@@ -83,5 +87,22 @@ describe("formatDate", () => {
   it("agrega el día de la semana de Cancún", () => {
     // 03:00 UTC del viernes 6 = 22:00 del jueves 5 en Cancún.
     expect(formatDateWithWeekday(new Date("2026-11-06T03:00:00Z"))).toBe("jueves 05/11/2026");
+  });
+});
+
+describe("meses y días del historial", () => {
+  it("mueve meses cruzando el año", () => {
+    expect(shiftMonth("2026-01", -1)).toBe("2025-12");
+    expect(shiftMonth("2026-11", 2)).toBe("2027-01");
+    expect(shiftMonth("2026-03", 0)).toBe("2026-03");
+  });
+
+  it("nombra el mes y los días en español", () => {
+    expect(formatMonth("2026-11")).toBe("noviembre de 2026");
+    expect(formatDayHeading("2026-11-05", "2026-11-05")).toBe("Hoy");
+    expect(formatDayHeading("2026-11-04", "2026-11-05")).toBe("Ayer");
+    // 1 de noviembre de 2026 fue domingo.
+    expect(formatDayHeading("2026-11-01", "2026-11-05")).toBe("domingo 01/11/2026");
+    expect(addDaysToIsoDate("2026-12-31", 1)).toBe("2027-01-01");
   });
 });
