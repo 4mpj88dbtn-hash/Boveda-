@@ -1,32 +1,18 @@
 import type { NextConfig } from "next";
 
-// Encabezados de seguridad para todas las páginas.
-const securityHeaders = [
-  { key: "X-Content-Type-Options", value: "nosniff" },
-  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  {
-    key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
-  },
-  {
-    key: "Content-Security-Policy",
-    // En Vercel la app no se puede incrustar en otros sitios. En desarrollo se permite
-    // para que funcione la vista previa del entorno.
-    value: [
-      "base-uri 'self'",
-      "form-action 'self'",
-      "object-src 'none'",
-      process.env.VERCEL ? "frame-ancestors 'none'" : "",
-    ]
-      .filter(Boolean)
-      .join("; "),
-  },
-];
+// La app se publica en GitHub Pages: https://4mpj88dbtn-hash.github.io/Boveda-/
+export const BASE_PATH = "/Boveda-";
 
 const nextConfig: NextConfig = {
-  cacheComponents: true,
-  partialPrefetching: true,
+  // Sin servidor: la compilación genera archivos estáticos en `out/`.
+  output: "export",
+  basePath: BASE_PATH,
+  trailingSlash: true,
+  images: { unoptimized: true },
   poweredByHeader: false,
+  env: {
+    NEXT_PUBLIC_BASE_PATH: BASE_PATH,
+  },
   turbopack: {
     rules: {
       "*.css": {
@@ -34,19 +20,6 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
-  },
-  async headers() {
-    return [
-      { source: "/(.*)", headers: securityHeaders },
-      {
-        source: "/sw.js",
-        headers: [
-          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
-          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
-          { key: "Content-Security-Policy", value: "default-src 'self'; script-src 'self'" },
-        ],
-      },
-    ];
   },
 };
 
