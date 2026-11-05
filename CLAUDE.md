@@ -35,7 +35,7 @@ App web personal (PWA instalable en celular y computadora) para manejar finanzas
 | Capa | Herramienta |
 |---|---|
 | Frontend | Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS 4 + shadcn/ui |
-| PWA y modo sin conexión | Serwist (service worker) + IndexedDB con Dexie (cola de movimientos que se sincroniza después) |
+| PWA y modo sin conexión | Service worker propio (`public/sw.js`) + IndexedDB con Dexie en la Fase 1 (cola de movimientos que se sincroniza después) |
 | Datos y autenticación | Supabase: Postgres, Auth con 2FA, Row Level Security, Storage y Cron |
 | Lógica de servidor | Route Handlers y Server Actions de Next.js en Vercel; las tareas programadas las dispara Supabase Cron |
 | Validación | Zod 4 |
@@ -47,6 +47,13 @@ App web personal (PWA instalable en celular y computadora) para manejar finanzas
 | Despliegue | Vercel (plan Hobby) + Supabase (plan Free) |
 
 Antes de instalar o actualizar una dependencia, revisa su versión vigente (`npm view <paquete> version`).
+
+**Next.js 16.4 no es el que conoces:** antes de escribir código lee la guía que viene en `node_modules/next/dist/docs/` (ver `AGENTS.md`). Puntos clave de este proyecto:
+
+- `cacheComponents` está activo: todo lo que lea la sesión o la hora va dentro de `<Suspense>`. `createClient()` llama a `connection()` para que nada con sesión se pre-renderice.
+- El antiguo `middleware` ahora es `src/proxy.ts`: renueva la sesión y redirige. Es solo una revisión rápida; cada página y Server Action vuelve a verificar con `requireUser()`.
+- Para saber si alguien ya activó su 2FA usa `mfa.listFactors()` (dato verificado), no `getAuthenticatorAssuranceLevel()` sin JWT (lee la cookie sin verificar).
+- La CLI de Supabase v3 aplica `db push` a la base local por defecto; para la nube se usa `--remote --yes` (lo hace el flujo de GitHub Actions).
 
 ## Convenciones de código
 
@@ -99,4 +106,17 @@ Antes de instalar o actualizar una dependencia, revisa su versión vigente (`npm
 
 ## Comandos
 
-Se completan en la Fase 0, al crear el proyecto (instalar, desarrollo, pruebas, revisión de código y compilación).
+| Comando | Qué hace |
+|---|---|
+| `npm install` | Instala las dependencias |
+| `npm run dev` | App en desarrollo (http://localhost:3000) |
+| `npm run check` | Estilo (ESLint), tipos y pruebas unitarias. Córrelo antes de cada commit |
+| `npm run build` | Compila para producción |
+| `npm test` | Pruebas unitarias (Vitest) |
+| `npm run db:start` / `db:stop` / `db:reset` | Base local de Supabase en Docker |
+| `npm run test:db` | Pruebas pgTAP de las reglas de acceso (requiere la base local) |
+| `npm run test:e2e` | Flujo completo con Playwright (requiere la base local y `.env.local`) |
+| `npm run db:types` | Regenera `src/lib/supabase/database.types.ts` después de una migración |
+| `npm run db:usuario -- correo contraseña` | Crea un usuario en la base local |
+
+Nueva tabla: `npx supabase migration new <nombre>`, con su política restrictiva de 2FA, sus políticas del dueño y una prueba en `supabase/tests/database/`.

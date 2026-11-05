@@ -1,6 +1,11 @@
 # Arquitectura de Bóveda
 
-> **Estado: propuesta pendiente de aprobación** (05/11/2026). Cuando la apruebes, se vuelve la referencia del proyecto.
+> **Estado: aprobada** el 05/11/2026 ("haz la app") con las recomendaciones por defecto: login con contraseña y 2FA, nombre "Bóveda", soporte para iPhone y Android. Es la referencia del proyecto.
+>
+> **Ajustes al construir la Fase 0:**
+> - Service worker propio (`public/sw.js`) en lugar de Serwist: para instalar la app y mostrar la pantalla sin conexión basta con un archivo pequeño que controlamos por completo. Se reevalúa en la Fase 1, cuando llegue el registro sin conexión.
+> - Next.js 16.4 trae Cache Components activo: el marco de la app carga al instante y lo que depende de tu sesión llega después, dentro de `<Suspense>`.
+> - Todo el inicio de sesión ocurre en el servidor (Server Actions); el navegador nunca habla directo con Supabase.
 
 ## 1. En una frase
 
@@ -51,28 +56,29 @@ Next.js (App Router) + TypeScript + Tailwind + shadcn/ui como PWA; Supabase (Pos
 
 ```
 src/
+  proxy.ts                   renueva la sesión y manda a cada quien a su paso (entrar, 2FA, app)
   app/                       rutas (las URLs van en español)
-    (auth)/entrar/           inicio de sesión y 2FA
+    entrar/                  contraseña, activar 2FA y verificar código
     (app)/                   todo lo que requiere sesión con 2FA
       page.tsx               Centro de mando
-      finanzas/ mercados/ inversion/ trading/ senales/ ajustes/
-    api/
-      cron/[tarea]/          tareas que dispara Supabase Cron (con secreto)
-      telegram/              webhook del bot
+      finanzas/ mercados/ inversion/ trading/ senales/ boveda/ ajustes/
+    sin-conexion/            pantalla que muestra el service worker sin internet
+    api/                     (Fase 3) cron/[tarea] para Supabase Cron y telegram/ para el bot
   modules/                   un módulo por área
-    finance/ markets/ news/ investing/ trading/
-      components/            piezas de pantalla del módulo
-      server/                acceso a datos y APIs (solo servidor)
+    profile/                 perfil y saludo
+    command-center/          encabezado del patrimonio y saludo
+    finance/ markets/ news/ investing/ trading/   (fases siguientes)
       lib/                   cálculos puros + sus pruebas (*.test.ts)
   components/
-    ui/                      componentes base (shadcn/ui)
-    layout/                  barra inferior, barra lateral, encabezados
-  lib/                       compartido: money.ts, dates.ts, format.ts, env.ts, supabase/
-  sw.ts                      service worker (Serwist)
+    ui/                      componentes base (botón, campo, panel, monto, avisos)
+    layout/                  barra inferior, barra lateral, hoja de registro rápido
+  lib/                       compartido: money.ts, dates.ts, env.ts, utils.ts, auth/, supabase/
+public/sw.js                 service worker propio
 supabase/
   migrations/                SQL versionado: tablas, RLS, tareas programadas
-  seed.sql                   categorías predefinidas
+  tests/database/            pruebas pgTAP de las reglas de acceso
 tests/e2e/                   pruebas de flujo completo (Playwright)
+.github/workflows/           revisión automática y migraciones
 docs/                        SPEC, arquitectura y diseño
 ```
 

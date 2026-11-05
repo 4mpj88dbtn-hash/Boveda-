@@ -1,6 +1,8 @@
 # Diseño de Bóveda
 
-> **Estado: propuesta pendiente de aprobación** (05/11/2026). Tokens y bocetos del Centro de mando según §8 del SPEC.
+> **Estado: aprobado** el 05/11/2026. Tokens y bocetos del Centro de mando según §8 del SPEC.
+>
+> **En el código** los tokens viven en `src/app/globals.css` (bloque `@theme`) y se usan como clases de Tailwind: `bg-fondo`, `bg-superficie`, `bg-elevada`, `border-borde`, `border-borde-control`, `text-texto`, `text-texto-2`, `text-laton`, `text-positivo`, `text-negativo-texto`, `bg-negativo`. Tamaños: `text-hero`, `text-display`, `text-titulo`, `text-cifra`, `text-cuerpo`, `text-interfaz`, `text-etiqueta`, `text-nota` (con su versión `-lg` para escritorio). Los colores por defecto de Tailwind están desactivados a propósito.
 
 **Concepto:** banca privada de día, centro de mando de noche. La sobriedad de una oficina ejecutiva de lujo con la precisión de una sala de control subterránea. Poderoso, discreto, exacto; nada caricaturesco. Es solo una inspiración de estilo: sin logotipos, murciélagos, nombres ni recursos de DC/Warner.
 

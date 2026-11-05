@@ -25,17 +25,21 @@ Las secciones citadas (§) se refieren a [`docs/SPEC.pdf`](docs/SPEC.pdf). Donde
 
 - [x] Leer el SPEC completo; crear `CLAUDE.md` y `ROADMAP.md`
 - [x] Proponer arquitectura ([`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md)), tokens de diseño y bocetos del Centro de mando ([`docs/DISENO.md`](docs/DISENO.md))
-- [ ] Aprobación del usuario: arquitectura, tokens y bocetos
-- [ ] Proyecto Next.js + TypeScript + Tailwind + shadcn/ui, con revisión de código y pruebas (Vitest)
-- [ ] Tokens de diseño, tipografías auto-alojadas y modo oscuro
-- [ ] Componentes base: botones, campos, tarjetas, montos con números tabulares, aviso educativo, estados vacíos y de error
-- [ ] Navegación: barra inferior con "+" central (celular) y barra lateral (escritorio)
-- [ ] Centro de mando vacío con el encabezado memorable (retícula técnica) y su única secuencia de carga
-- [ ] Supabase: migración inicial (perfil y ajustes) con Row Level Security
-- [ ] Inicio de sesión con 2FA obligatorio; registro público desactivado; cerrar sesión
-- [ ] PWA: manifiesto, íconos, instalable, pantalla sin conexión
-- [ ] GitHub Actions: revisión de tipos, pruebas y migraciones automáticas al fusionar a `main`
-- [ ] Despliegue en Vercel, `README.md` en español y `.env.example`
+- [x] Aprobación del plan, los tokens y los bocetos ("haz la app", 05/11/2026)
+- [x] Proyecto Next.js 16 + TypeScript + Tailwind 4, con revisión de código (ESLint) y pruebas (Vitest y Playwright). Los componentes base se escribieron a mano con el estilo de shadcn/ui, porque su catálogo no está disponible desde este entorno
+- [x] Tokens de diseño, tipografías auto-alojadas y modo oscuro
+- [x] Componentes base: botones, campos, paneles, montos con números tabulares, aviso educativo, estados vacíos y de error
+- [x] Utilidades de dinero (centavos, redondeo, MXN/USD) y fechas (hora de Cancún, semanas de lunes a domingo) con pruebas
+- [x] Navegación: barra inferior con "+" central (celular) y barra lateral (escritorio)
+- [x] Centro de mando vacío con el encabezado memorable (retícula técnica) y su única secuencia de carga
+- [x] Supabase: migración inicial (perfil) con Row Level Security que exige 2FA, y pruebas pgTAP
+- [x] Inicio de sesión con 2FA obligatorio; registro público desactivado; cerrar sesión
+- [x] Ajustes: nombre del saludo, estado del 2FA e instrucciones para instalar la app
+- [x] PWA: manifiesto, íconos, instalable, pantalla sin conexión
+- [x] GitHub Actions: revisión automática (estilo, tipos, pruebas, compilación, base de datos y flujo completo) y migraciones al fusionar a `main`
+- [x] `README.md` en español y `.env.example`
+- [ ] Publicar en Vercel con tu proyecto de Supabase (necesita tus cuentas; pasos en el README)
+- [ ] Tu prueba y aprobación de la Fase 0
 
 **Cómo se aprueba:** instalas la app en tu celular, entras con tu cuenta y tu código 2FA, y ves el Centro de mando con el diseño.
 
