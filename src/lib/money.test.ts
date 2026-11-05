@@ -105,4 +105,10 @@ describe("formatPercent", () => {
     expect(formatPercent(-0.0101)).toBe("-1.01%");
     expect(formatPercent(0)).toBe("0.00%");
   });
+
+  it("sin signo para tasas como la de ahorro", () => {
+    // 1,438,500 ÷ 1,500,000 = 0.959 → 95.9%
+    expect(formatPercent(0.959, 1, "auto")).toBe("95.9%");
+    expect(formatPercent(-0.25, 1, "auto")).toBe("-25.0%");
+  });
 });

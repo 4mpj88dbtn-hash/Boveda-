@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { Amount } from "@/components/ui/amount";
 import { cn } from "@/lib/utils";
 import { LOAD_SEQUENCE_ATTRIBUTE, LOAD_SEQUENCE_KEY } from "./load-sequence";
 
 type CommandHeaderProps = {
-  /** Patrimonio neto en centavos, o null si todavía no hay cuentas. */
+  /** Patrimonio neto en centavos, o null mientras carga. */
   netWorthCents: number | null;
-  /** Cambio del mes en centavos. */
+  /** Ingresos menos gastos del mes, en centavos. */
   monthChangeCents?: number;
+  /** Texto de apoyo bajo la cifra: qué hacer si aún no hay datos, o un aviso. */
+  note?: ReactNode;
 };
 
 /**
@@ -17,7 +19,7 @@ type CommandHeaderProps = {
  * técnica tenue. La retícula se ilumina alrededor del cursor o del dedo. Al abrir la app,
  * se enciende una sola vez por sesión. Con "reducir movimiento" queda estática.
  */
-export function CommandHeader({ netWorthCents, monthChangeCents }: CommandHeaderProps) {
+export function CommandHeader({ netWorthCents, monthChangeCents, note }: CommandHeaderProps) {
   const ref = useRef<HTMLElement>(null);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [active, setActive] = useState(false);
@@ -50,8 +52,6 @@ export function CommandHeader({ netWorthCents, monthChangeCents }: CommandHeader
     if (hideAfter) hideTimer.current = setTimeout(() => setActive(false), hideAfter);
   }
 
-  const hasData = netWorthCents !== null;
-
   return (
     <section
       ref={ref}
@@ -81,18 +81,14 @@ export function CommandHeader({ netWorthCents, monthChangeCents }: CommandHeader
         Patrimonio neto
       </h2>
       <p className="primera-carga:animate-enfocar-cifra mt-2 font-serif text-hero font-semibold lg:text-hero-lg">
-        <Amount cents={netWorthCents ?? 0} tone={hasData ? "neutro" : "apagado"} />
+        <Amount cents={netWorthCents ?? 0} tone={netWorthCents === null ? "apagado" : "neutro"} />
       </p>
-      {hasData ? (
+      {netWorthCents !== null && monthChangeCents !== undefined ? (
         <p className="mt-3 text-interfaz text-texto-2">
-          <Amount cents={monthChangeCents ?? 0} tone="variacion" /> este mes
+          <Amount cents={monthChangeCents} tone="variacion" /> este mes
         </p>
-      ) : (
-        <p className="mt-3 max-w-[48ch] text-interfaz text-texto-2">
-          Aún no hay cuentas registradas. Cuando las agregues en la Fase 1, aquí verás tu patrimonio
-          neto: lo que tienes menos lo que debes.
-        </p>
-      )}
+      ) : null}
+      {note ? <p className="mt-3 max-w-[52ch] text-interfaz text-texto-2">{note}</p> : null}
     </section>
   );
 }

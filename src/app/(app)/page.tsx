@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Amount } from "@/components/ui/amount";
 import { EducationalNotice, EmptyState, PhaseTag } from "@/components/ui/notices";
 import { Panel } from "@/components/ui/panel";
-import { CommandHeader } from "@/modules/command-center/command-header";
 import { Greeting } from "@/modules/command-center/greeting";
+import { MonthPanel, NetWorthHeader } from "@/modules/finance/overview";
 
 export const metadata: Metadata = { title: "Centro de mando" };
 
@@ -12,25 +11,10 @@ export default function CommandCenterPage() {
     <>
       <Greeting />
 
-      <CommandHeader netWorthCents={null} />
+      <NetWorthHeader />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
-        <Panel title="Este mes">
-          <dl className="grid grid-cols-3 gap-3">
-            {["Ingresos", "Gastos", "Balance"].map((label) => (
-              <div key={label} className="flex min-w-0 flex-col gap-1">
-                <dt className="text-etiqueta text-texto-2">{label}</dt>
-                <dd className="font-serif text-cifra font-semibold">
-                  <Amount cents={0} tone="apagado" />
-                </dd>
-              </div>
-            ))}
-          </dl>
-          <EmptyState
-            title="Sin movimientos todavía"
-            description="Con el botón + registrarás gastos e ingresos en 3 toques. Llega en la Fase 1."
-          />
-        </Panel>
+        <MonthPanel />
 
         <Panel title="Portafolio S&P 500" action={<PhaseTag phase={4} />}>
           <EmptyState

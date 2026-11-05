@@ -98,12 +98,19 @@ export function formatMoney(
   return formatter.format(decimal);
 }
 
-/** Porcentaje con signo: 0.0125 → "+1.25%". */
-export function formatPercent(ratio: number, fractionDigits = 2): string {
+/**
+ * Porcentaje con signo: 0.0125 → "+1.25%". Para tasas que no son variaciones (tasa de
+ * ahorro) usa `signDisplay: "auto"` → "91.4%".
+ */
+export function formatPercent(
+  ratio: number,
+  fractionDigits = 2,
+  signDisplay: "exceptZero" | "auto" = "exceptZero",
+): string {
   return new Intl.NumberFormat(LOCALE, {
     style: "percent",
     minimumFractionDigits: fractionDigits,
     maximumFractionDigits: fractionDigits,
-    signDisplay: "exceptZero",
+    signDisplay,
   }).format(ratio);
 }
