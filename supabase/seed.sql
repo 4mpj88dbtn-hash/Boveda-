@@ -1,0 +1,2 @@
+-- Datos de ejemplo para la base local. Vacío en la Fase 0.
+-- Nunca pongas aquí datos reales.
