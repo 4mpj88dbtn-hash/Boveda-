@@ -18,8 +18,9 @@ export async function updateDisplayName(
   formData: FormData,
 ): Promise<ProfileFormState> {
   const user = await requireUser();
-  const parsed = displayNameSchema.safeParse(String(formData.get("displayName") ?? ""));
-  if (!parsed.success) return { error: parsed.error.issues[0]?.message, displayName: String(formData.get("displayName") ?? "") };
+  const typed = String(formData.get("displayName") ?? "");
+  const parsed = displayNameSchema.safeParse(typed);
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message, displayName: typed };
 
   const supabase = await createClient();
   const { error } = await supabase
