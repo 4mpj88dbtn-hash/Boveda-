@@ -4,6 +4,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { z } from "zod";
 import { getDb } from "./db";
 import { ISO_DATE_PATTERN, RATE_PATTERN } from "@/modules/finance/types";
+import { tradingPlanSchema, tradingRulesSchema } from "@/modules/trading/types";
 import { LOCK_POLICIES } from "./lock/policy";
 
 /** Ajustes guardados en el celular, cada uno validado al leerlo. */
@@ -83,6 +84,10 @@ const settingSchemas = {
     maxPorHora: z.number().int().min(1).max(30),
     prioridades: z.array(z.enum(["critica", "importante", "informativa"])).min(1),
   }),
+  /** Trading: capital ficticio, regla de riesgo y límites de pérdida. */
+  tradingRules: tradingRulesSchema,
+  /** Trading: tu plan escrito. */
+  tradingPlan: tradingPlanSchema,
 } as const;
 
 export type SettingKey = keyof typeof settingSchemas;

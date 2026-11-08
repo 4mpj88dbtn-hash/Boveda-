@@ -20,6 +20,7 @@ import {
   type Transaction,
 } from "@/modules/finance/types";
 import type { Dividend, Purchase } from "@/modules/investing/lib/portfolio";
+import { tradeReviewSchema, tradeSchema, type Trade, type TradeImage, type TradeReview } from "@/modules/trading/types";
 import { todayInCancun } from "./dates";
 
 /**
@@ -29,9 +30,10 @@ import { todayInCancun } from "./dates";
  *   v2 (Fase 1, parte 1): ajustes, cuentas, categorías y movimientos.
  *   v3 (Fase 1, parte 2): además presupuestos, recurrentes, plantillas y fotos de tickets.
  *   v4 (Fase 4): además compras de ETFs y dividendos.
+ *   v5 (Fase 5): además operaciones de trading, sus capturas y revisiones semanales.
  */
 
-export const BACKUP_VERSION = 4;
+export const BACKUP_VERSION = 5;
 
 /** Ajustes que nunca salen del celular. */
 export const PRIVATE_SETTING_KEYS = ["pin", "pinFailures"] as const;
@@ -51,6 +53,9 @@ const attachmentFileSchema = z.object({
 });
 type AttachmentFile = z.infer<typeof attachmentFileSchema>;
 
+const tradeImageFileSchema = attachmentFileSchema.omit({ transactionId: true }).extend({ tradeId: z.string().min(1).max(64) });
+type TradeImageFile = z.infer<typeof tradeImageFileSchema>;
+
 const backupSchema = z.object({
   app: z.literal("boveda"),
   version: z.number().int().positive(),
@@ -67,6 +72,9 @@ const backupSchema = z.object({
     attachments: z.array(attachmentFileSchema).optional(),
     purchases: z.array(purchaseSchema).optional(),
     dividends: z.array(dividendSchema).optional(),
+    trades: z.array(tradeSchema).optional(),
+    tradeImages: z.array(tradeImageFileSchema).optional(),
+    tradeReviews: z.array(tradeReviewSchema).optional(),
   }),
 });
 
@@ -81,10 +89,13 @@ export type BackupTables = {
   attachments: Attachment[];
   purchases: Purchase[];
   dividends: Dividend[];
+  trades: Trade[];
+  tradeImages: TradeImage[];
+  tradeReviews: TradeReview[];
 };
 
 /** Tal como se escribe en el archivo. */
-type BackupFileData = Omit<BackupTables, "attachments"> & { attachments: AttachmentFile[] };
+type BackupFileData = Omit<BackupTables, "attachments" | "tradeImages"> & { attachments: AttachmentFile[]; tradeImages: TradeImageFile[] };
 export type BackupJson = { app: "boveda"; version: number; exportedAt: string; data: BackupFileData };
 export type BackupFile = { app: "boveda"; version: number; exportedAt: string; data: BackupTables };
 
@@ -117,6 +128,7 @@ export function buildBackup(tables: BackupTables, now: Date): BackupJson {
       ...tables,
       settings: tables.settings.filter((row) => !isPrivate(row.key)),
       attachments: tables.attachments.map(({ data, ...rest }) => ({ ...rest, dataBase64: bytesToBase64(data) })),
+      tradeImages: tables.tradeImages.map(({ data, ...rest }) => ({ ...rest, dataBase64: bytesToBase64(data) })),
     },
   };
 }
@@ -124,13 +136,14 @@ export function buildBackup(tables: BackupTables, now: Date): BackupJson {
 export type ParseBackupResult = { ok: true; backup: BackupFile } | { ok: false; error: string };
 
 const NOT_A_BACKUP = "El archivo no es un respaldo de Bóveda. Elige el archivo .json que descargaste.";
-const DAMAGED = "El respaldo está dañado: tiene datos que apuntan a cuentas, categorías o movimientos que no existen.";
+const DAMAGED = "El respaldo está dañado: tiene datos que apuntan a cuentas, categorías, movimientos u operaciones que no existen.";
 
 /** Revisa que todo apunte a cuentas, categorías y movimientos del mismo respaldo. */
 function hasBrokenReferences(data: BackupTables): boolean {
   const accounts = new Map(data.accounts.map((account) => [account.id, account]));
   const categories = new Set(data.categories.map((category) => category.id));
   const transactions = new Set(data.transactions.map((transaction) => transaction.id));
+  const trades = new Set(data.trades.map((trade) => trade.id));
 
   const movementBroken = (movement: Omit<Transaction, "id" | "date" | "createdAt" | "updatedAt">) => {
     const from = accounts.get(movement.accountId);
@@ -152,6 +165,7 @@ function hasBrokenReferences(data: BackupTables): boolean {
         (template.toAccountId !== null && !accounts.has(template.toAccountId)),
     ) ||
     data.attachments.some((attachment) => !transactions.has(attachment.transactionId)) ||
+    data.tradeImages.some((image) => !trades.has(image.tradeId)) ||
     data.categories.some((category) => category.parentId !== null && !categories.has(category.parentId))
   );
 }
@@ -172,8 +186,10 @@ export function parseBackup(text: string): ParseBackupResult {
   const { data } = parsed.data;
   const exportedAt = Date.parse(parsed.data.exportedAt);
   let attachments: Attachment[];
+  let tradeImages: TradeImage[];
   try {
     attachments = (data.attachments ?? []).map(({ dataBase64, ...rest }) => ({ ...rest, data: base64ToBytes(dataBase64) }));
+    tradeImages = (data.tradeImages ?? []).map(({ dataBase64, ...rest }) => ({ ...rest, data: base64ToBytes(dataBase64) }));
   } catch {
     return { ok: false, error: NOT_A_BACKUP };
   }
@@ -189,6 +205,9 @@ export function parseBackup(text: string): ParseBackupResult {
     attachments,
     purchases: data.purchases ?? [],
     dividends: data.dividends ?? [],
+    trades: data.trades ?? [],
+    tradeImages,
+    tradeReviews: data.tradeReviews ?? [],
   };
   if (hasBrokenReferences(tables)) return { ok: false, error: DAMAGED };
   return { ok: true, backup: { app: "boveda", version: parsed.data.version, exportedAt: parsed.data.exportedAt, data: tables } };

@@ -1,6 +1,7 @@
 import Dexie, { type EntityTable, type Transaction as DexieTransaction } from "dexie";
 import { DEFAULT_CATEGORIES, defaultAccounts } from "@/modules/finance/defaults";
 import type { Dividend, Purchase } from "@/modules/investing/lib/portfolio";
+import type { Trade, TradeImage, TradeReview } from "@/modules/trading/types";
 import type {
   Account,
   Attachment,
@@ -29,6 +30,9 @@ export class BovedaDatabase extends Dexie {
   attachments!: EntityTable<Attachment, "id">;
   purchases!: EntityTable<Purchase, "id">;
   dividends!: EntityTable<Dividend, "id">;
+  trades!: EntityTable<Trade, "id">;
+  tradeImages!: EntityTable<TradeImage, "id">;
+  tradeReviews!: EntityTable<TradeReview, "weekStart">;
 
   constructor(name = "boveda") {
     super(name);
@@ -66,6 +70,22 @@ export class BovedaDatabase extends Dexie {
       attachments: "id, transactionId",
       purchases: "id, date, assetId",
       dividends: "id, date, assetId",
+    });
+    // Fase 5: operaciones de trading (simulador y reales), sus capturas y revisiones semanales.
+    this.version(5).stores({
+      settings: "key",
+      accounts: "id, order",
+      categories: "id, type, order",
+      transactions: "id, date, type, categoryId, accountId, toAccountId, createdAt",
+      budgets: "categoryId",
+      recurring: "id, nextDate",
+      templates: "id, order",
+      attachments: "id, transactionId",
+      purchases: "id, date, assetId",
+      dividends: "id, date, assetId",
+      trades: "id, account, status, openedAt, closedAt",
+      tradeImages: "id, tradeId",
+      tradeReviews: "weekStart",
     });
     // Base nueva: se crea directo en la última versión y aquí recibe lo inicial.
     this.on("populate", seedFinance);

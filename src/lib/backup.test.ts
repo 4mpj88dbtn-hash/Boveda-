@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_CATEGORIES } from "@/modules/finance/defaults";
 import { account, movement } from "@/modules/finance/lib/test-data";
+import { makeTrade } from "@/modules/trading/lib/test-helpers";
 import { base64ToBytes, backupFileName, buildBackup, bytesToBase64, parseBackup, type BackupTables } from "./backup";
 
 const settings = [
@@ -36,6 +37,11 @@ const tables: BackupTables = {
     },
   ],
   dividends: [],
+  trades: [makeTrade({ id: "op-1", exitPrice: "102", lesson: "Esperé la confirmación." })],
+  tradeImages: [
+    { id: "captura-1", tradeId: "op-1", mimeType: "image/jpeg", data: new Uint8Array([255, 216, 255, 9]).buffer, width: 30, height: 20, createdAt: 2 },
+  ],
+  tradeReviews: [{ weekStart: "2026-11-02", answers: { plan: "Sí, en todas." }, createdAt: 3, updatedAt: 3 }],
   attachments: [
     {
       id: "foto-1",
@@ -55,7 +61,8 @@ describe("buildBackup", () => {
   it("incluye tus datos pero nunca el PIN ni los intentos fallidos", () => {
     const backup = buildBackup(tables, NOW);
     expect(backup.app).toBe("boveda");
-    expect(backup.version).toBe(4);
+    expect(backup.version).toBe(5);
+    expect(backup.data.tradeImages[0]?.dataBase64).toBe("/9j/CQ==");
     expect(backup.data.attachments[0]?.dataBase64).toBe("/9j/AAEC");
     expect(backup.exportedAt).toBe("2026-11-05T15:00:00.000Z");
     expect(backup.data.settings.map((row) => row.key)).toEqual(["displayName", "lockPolicy"]);
@@ -131,6 +138,11 @@ describe("parseBackup", () => {
   ])("rechaza movimientos con %s", (_case, transaction) => {
     const text = JSON.stringify(buildBackup({ ...tables, transactions: [transaction] }, NOW));
     expect(parseBackup(text)).toMatchObject({ ok: false, error: expect.stringMatching(/dañado/) });
+  });
+
+  it("rechaza una captura de una operación que no existe", () => {
+    const capture = buildBackup({ ...tables, trades: [] }, NOW);
+    expect(parseBackup(JSON.stringify(capture))).toMatchObject({ ok: false, error: expect.stringMatching(/dañado/) });
   });
 
   it("rechaza un presupuesto o una foto que apuntan a algo que no existe", () => {

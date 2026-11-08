@@ -9,7 +9,7 @@ import { parseSetting, setSetting, SETTING_KEYS, type SettingKey } from "@/lib/s
 export async function downloadBackup(): Promise<"compartido" | "descargado" | "cancelado"> {
   const now = new Date();
   const db = getDb();
-  const [settings, accounts, categories, transactions, budgets, recurring, templates, attachments, purchases, dividends] = await Promise.all([
+  const [settings, accounts, categories, transactions, budgets, recurring, templates, attachments, purchases, dividends, trades, tradeImages, tradeReviews] = await Promise.all([
     db.settings.toArray(),
     db.accounts.toArray(),
     db.categories.toArray(),
@@ -20,9 +20,12 @@ export async function downloadBackup(): Promise<"compartido" | "descargado" | "c
     db.attachments.toArray(),
     db.purchases.toArray(),
     db.dividends.toArray(),
+    db.trades.toArray(),
+    db.tradeImages.toArray(),
+    db.tradeReviews.toArray(),
   ]);
   const backup = buildBackup(
-    { settings, accounts, categories, transactions, budgets, recurring, templates, attachments, purchases, dividends },
+    { settings, accounts, categories, transactions, budgets, recurring, templates, attachments, purchases, dividends, trades, tradeImages, tradeReviews },
     now,
   );
   const file = new File([JSON.stringify(backup, null, 2)], backupFileName(now), { type: "application/json" });
@@ -51,6 +54,9 @@ export async function restoreBackup(backup: BackupFile): Promise<void> {
     db.attachments,
     db.purchases,
     db.dividends,
+    db.trades,
+    db.tradeImages,
+    db.tradeReviews,
   ];
   await db.transaction("rw", tables, async () => {
     await db.settings.bulkDelete(RESTORABLE_KEYS);
@@ -70,5 +76,8 @@ export async function restoreBackup(backup: BackupFile): Promise<void> {
     await db.attachments.bulkPut(data.attachments);
     await db.purchases.bulkPut(data.purchases);
     await db.dividends.bulkPut(data.dividends);
+    await db.trades.bulkPut(data.trades);
+    await db.tradeImages.bulkPut(data.tradeImages);
+    await db.tradeReviews.bulkPut(data.tradeReviews);
   });
 }
