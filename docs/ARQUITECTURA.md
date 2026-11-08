@@ -83,9 +83,9 @@ La ruta base es `/Boveda-` (el nombre del repositorio). Los enlaces de Next la a
 | Registro, cuentas, presupuestos, historial (Fase 1) | Igual, todo en el dispositivo y sin conexión |
 | Resúmenes semanal y mensual (Fase 1) | Se calculan en la app y aparecen desde la hora indicada (domingo 20:00, día 1 a las 9:00). No llegan solos por Telegram |
 | Precios y gráficas (Fase 2) | Hecho: `scripts/mercados/actualizar.mjs` corre en GitHub Actions (cada 20 min en horario de mercado, cada 3 h fuera) y escribe `datos/mercados.json` (precios), `datos/intradia/<id>.json` (1D y 5D) y `datos/series/<id>.json` (diaria 5 años y semanal desde el inicio, una vez al día). `scripts/publicar-gh-pages.sh` publica la app y los datos sin pisarse (un solo commit en `gh-pages`, reintento con `--force-with-lease`). La app los lee con Zod y el service worker guarda la última copia para usarla sin internet |
-| Noticias y calendario (Fase 3) | Igual que los precios: los arma GitHub Actions |
+| Noticias y calendario (Fase 3) | Hecho: `scripts/senales/actualizar.mjs` (mismo flujo de GitHub Actions, después de los precios) escribe `datos/noticias.json`, `datos/calendario.json`, `datos/senales.json` (avisos públicos) y `datos/senales-estado.json` (qué ya se avisó; las alertas personales van con clave cifrada por hash) |
 | Avisos por Telegram (Fase 3) | Los de mercado (pre-apertura, cierre, movimientos fuertes) sí, desde GitHub Actions. Los que usan tus datos (presupuestos, pagos, resúmenes) se ven al abrir la app; se puede enviar a Telegram desde la app a mano |
-| Notificaciones push | Solo las de mercado, y requieren un servicio de envío; se evaluará en la Fase 3 |
+| Notificaciones push | Evaluado el 08/11/2026: no por ahora. Web Push necesita guardar la suscripción de cada dispositivo en un servicio; sin servidor, Telegram cubre los avisos |
 | Portafolio, calculadoras, guía (Fase 4) | Igual, en el dispositivo. Los datos históricos vienen de los JSON de GitHub Actions |
 | Trading simulado (Fase 5) | Igual, con precios con retraso |
 | Observaciones con IA (Fase 6) | Requieren una clave de API. Sin servidor, la opción sería que escribas tu propia clave en la app (vive solo en tu dispositivo). Se decide en la Fase 6 |

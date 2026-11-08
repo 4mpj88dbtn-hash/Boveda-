@@ -43,6 +43,46 @@ const settingSchemas = {
   backupReminderSnoozedUntil: z.number(),
   /** Activos extra que sigues en Mercados (ids del catálogo). */
   watchlist: z.array(z.string().min(1).max(40)).max(40),
+  /** Alertas de precio guardadas en el dispositivo. */
+  priceAlerts: z
+    .array(
+      z.object({
+        id: z.string().min(1).max(64),
+        assetId: z.string().min(1).max(40),
+        condition: z.enum(["mayor", "menor"]),
+        value: z.number().positive(),
+        createdAt: z.number(),
+      }),
+    )
+    .max(50),
+  /** Noticias ya leídas (ids) y guardadas (copia completa, para que no se pierdan). */
+  newsRead: z.array(z.string().max(40)).max(500),
+  newsSaved: z
+    .array(
+      z.object({
+        id: z.string(),
+        titulo: z.string(),
+        enlace: z.string(),
+        fuente: z.string(),
+        fecha: z.string().nullable(),
+        guardadaEn: z.number(),
+      }),
+    )
+    .max(100),
+  /** Lo que elegiste para los avisos de Telegram (se copia a la variable SENALES_CONFIG). */
+  telegramConfig: z.object({
+    preapertura: z.boolean(),
+    cierre: z.boolean(),
+    movimientos: z.boolean(),
+    umbrales: z.record(z.string(), z.number().positive()),
+    noticias: z.boolean(),
+    alertasPrecio: z.array(z.object({ id: z.string(), condicion: z.enum(["mayor", "menor"]), valor: z.number() })),
+    aportacionDia: z.number().int().min(1).max(28).nullable(),
+    silencioDesde: z.number().int().min(0).max(23),
+    silencioHasta: z.number().int().min(0).max(23),
+    maxPorHora: z.number().int().min(1).max(30),
+    prioridades: z.array(z.enum(["critica", "importante", "informativa"])).min(1),
+  }),
 } as const;
 
 export type SettingKey = keyof typeof settingSchemas;

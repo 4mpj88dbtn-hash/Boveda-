@@ -11,7 +11,7 @@ Estado: ⬜ pendiente · 🟨 en curso · ✅ aprobada
 | 0 — Base | Diseño, componentes base, PIN, datos en el dispositivo, respaldos, sin conexión, publicación | App vacía con el diseño, el PIN y la instalación funcionando | ✅ |
 | 1 — Finanzas | Registro rápido, categorías, cuentas, historial, resúmenes semanal y mensual, presupuestos | Ya puedo usarla a diario | ✅ |
 | 2 — Mercados | Watchlist, gráficas, comparador base 100, estado del mercado | Veo todos mis activos clave | ✅ |
-| 3 — Noticias y señales | Feed, calendario económico, avisos de mercado por Telegram, alertas en la app | Me llegan avisos de mercado al celular | ⬜ |
+| 3 — Noticias y señales | Feed, calendario económico, avisos de mercado por Telegram, alertas en la app | Me llegan avisos de mercado al celular | ✅ |
 | 4 — Inversión S&P 500 | Portafolio, calculadoras, guía educativa, fundamentales | Controlo y entiendo mi inversión | ⬜ |
 | 5 — Trading | Simulador, diario, estadísticas, calculadoras, guías | Practico con método | ⬜ |
 | 6 — Pulido | Metas, deudas, tarjetas, suscripciones, exportación, IA opcional, recordatorio de respaldos, rendimiento | Versión completa | ⬜ |
@@ -92,15 +92,18 @@ Las secciones citadas (§) se refieren a [`docs/REQUISITOS.md`](docs/REQUISITOS.
 - [ ] Tú: guardar `BANXICO_TOKEN` y `FRED_API_KEY` en los secretos del repositorio para FIX, tasa objetivo y tasa de la Fed (pasos en el README)
 - [ ] Tú: fusionar a `main` para que la actualización programada corra sola (GitHub solo programa tareas en la rama principal)
 
-## Fase 3 — Noticias y señales ⬜
+## Fase 3 — Noticias y señales ✅
 
-**Entregable:** me llegan avisos de mercado al celular.
+**Entregable:** me llegan avisos de mercado al celular. Lista el 08/11/2026.
 
-- Feed financiero y calendario económico armados por GitHub Actions (§3.1)
-- Bot personal de Telegram para avisos de mercado: pre-apertura, cierre y movimientos fuertes (§3.2)
-- Alertas de precio y de presupuesto dentro de la app; envío manual a Telegram desde la app *(adaptado)*
-- Anti-spam: horario de silencio, máximo por hora, agrupar y prioridades
-- Panel "Señales" para activar o desactivar cada tipo de alerta
+- [x] Noticias de fuentes públicas verificadas desde GitHub Actions el 08/11/2026: Reserva Federal, Yahoo Finance, CNBC, MarketWatch, El Economista, El Financiero, Expansión, CoinDesk y Google Noticias (Banxico). Con tema, activos relacionados, prioridad (crítica, importante, informativa) y agrupación de la misma noticia en varias fuentes. No se usan las que bloquean bots (BLS, Cointelegraph)
+- [x] Filtros por tema y activo, marcar como leída y guardar
+- [x] Calendario económico oficial: reuniones del FOMC (Reserva Federal), PIB y PCE (BEA); con clave gratuita, inflación CPI y empleo (FRED) y resultados de empresas grandes (Finnhub). Banxico no publica su calendario en un formato que se pueda leer: se enlaza el oficial y sus anuncios llegan a Noticias
+- [x] Avisos por Telegram desde GitHub Actions: pre-apertura, cierre, movimientos fuertes (S&P 500 y Nasdaq ±1.5%, BTC ±5%, USD/MXN ±1%, editables), noticias de alto impacto, alertas de precio y recordatorio de aportación
+- [x] Anti-spam: horario de silencio, máximo por hora, prioridades y avisos agrupados
+- [x] Panel "Señales": señales recientes, alertas de precio del dispositivo y generador de la configuración de Telegram
+- [x] Notificaciones push del navegador: evaluadas y descartadas por ahora (necesitan un servicio que guarde tu suscripción); Telegram cubre los avisos
+- [ ] Tú: crear el bot y guardar `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` y la variable `SENALES_CONFIG` (pasos en Señales y en el README)
 
 ## Fase 4 — Inversión S&P 500 ⬜
 

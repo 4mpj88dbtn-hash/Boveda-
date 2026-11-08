@@ -5,6 +5,7 @@ import { Greeting } from "@/modules/command-center/greeting";
 import { MonthPanel, NetWorthHeader } from "@/modules/finance/overview";
 import { TodayPanel } from "@/modules/finance/today-panel";
 import { MarketsTicker } from "@/modules/markets/markets-ticker";
+import { NewsPanel, SignalsPanel } from "@/modules/signals/home-panels";
 
 export const metadata: Metadata = { title: "Centro de mando" };
 
@@ -38,18 +39,8 @@ export default function CommandCenterPage() {
       <MarketsTicker />
 
       <div className="grid gap-4 md:grid-cols-2 lg:gap-6">
-        <Panel title="Señales recientes" action={<PhaseTag phase={3} />}>
-          <EmptyState
-            title="Sin señales"
-            description="Las alertas de precio, la pre-apertura y el cierre del mercado llegarán aquí y a tu Telegram."
-          />
-        </Panel>
-        <Panel title="Noticias" action={<PhaseTag phase={3} />}>
-          <EmptyState
-            title="Sin noticias"
-            description="Noticias de la Fed, Banxico y de tus activos, con su fuente y su hora."
-          />
-        </Panel>
+        <SignalsPanel />
+        <NewsPanel />
       </div>
 
       <EducationalNotice />

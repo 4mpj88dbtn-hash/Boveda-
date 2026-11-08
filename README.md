@@ -63,7 +63,17 @@ Los precios de mercado funcionan sin claves (Yahoo Finance y Coinbase). Tres dat
 2. **`BANXICO_TOKEN`** (FIX y tasa objetivo de Banxico): pide el token en https://www.banxico.org.mx/SieAPIRest/service/v1/token.
 3. **`FRED_API_KEY`** (tasa de la Fed): crea una cuenta en https://fred.stlouisfed.org y pide una API key en tu perfil.
 
+4. **`FINNHUB_API_KEY`** (opcional, fechas de resultados de Apple, Microsoft, NVIDIA y otras): crea una cuenta gratuita en https://finnhub.io.
+
 La siguiente actualización (máximo 20 minutos en horario de mercado) ya los incluye.
+
+### Avisos por Telegram
+
+1. En Telegram abre **@BotFather**, escribe `/newbot` y sigue los pasos. Guarda el token como secreto **`TELEGRAM_BOT_TOKEN`**.
+2. Abre tu bot y tócale **Iniciar**. Luego abre **@userinfobot**: te dice tu Id. Guárdalo como secreto **`TELEGRAM_CHAT_ID`**.
+3. En la app, **Señales → Avisos en Telegram**, elige qué quieres recibir y copia la configuración. En GitHub: **Settings → Secrets and variables → Actions → pestaña Variables → New repository variable**, nombre **`SENALES_CONFIG`**, y pega el texto.
+
+Recibirás la pre-apertura, el cierre, los movimientos fuertes, las noticias de alto impacto, tus alertas de precio y el recordatorio de tu aportación, respetando tu horario de silencio. Tus movimientos y saldos nunca se mandan.
 
 ### Datos de mercado
 
