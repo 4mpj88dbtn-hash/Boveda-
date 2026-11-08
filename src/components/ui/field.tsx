@@ -22,6 +22,21 @@ export function Input({ className, ...props }: ComponentProps<"input">) {
   );
 }
 
+/** Texto de varias líneas con el mismo estilo que los campos. */
+export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
+  return (
+    <textarea
+      className={cn(
+        "min-h-24 w-full rounded-control border border-borde-control bg-fondo px-3 py-2.5 text-cuerpo text-texto",
+        "placeholder:text-texto-2 transition-colors duration-120 ease-boveda",
+        "focus-visible:border-laton focus-visible:outline-offset-0",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
 /** Lista desplegable nativa con el mismo estilo que los campos. */
 export function Select({ className, children, ...props }: ComponentProps<"select">) {
   return (

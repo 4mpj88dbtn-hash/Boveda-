@@ -33,18 +33,21 @@ export function LineChart({
   format,
   ariaLabel,
   height = 200,
+  includeZero = true,
 }: {
   series: LineSeries[];
   labels: string[];
   format: (value: number) => string;
   ariaLabel: string;
   height?: number;
+  /** Con false la escala se ajusta a los datos (curva de capital); con true parte de cero. */
+  includeZero?: boolean;
 }) {
   const width = 640;
   const pad = { top: 18, right: 8, bottom: 26, left: 8 };
   const all = series.flatMap((item) => item.values.filter((value): value is number => value !== null));
   if (all.length === 0 || labels.length < 2) return null;
-  let min = Math.min(...all, 0);
+  let min = includeZero ? Math.min(...all, 0) : Math.min(...all);
   let max = Math.max(...all);
   if (min === max) {
     min -= 1;

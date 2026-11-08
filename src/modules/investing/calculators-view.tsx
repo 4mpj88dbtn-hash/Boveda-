@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
-import { Field, Input } from "@/components/ui/field";
+import { useState } from "react";
+import { Explain, num, NumberInput, Result } from "@/components/ui/calculator";
+import { Input } from "@/components/ui/field";
 import { LineChart } from "@/components/ui/line-chart";
 import { EducationalNotice } from "@/components/ui/notices";
 import { Panel } from "@/components/ui/panel";
@@ -25,17 +26,6 @@ import {
 const mxn = (value: number) => (Number.isFinite(value) ? formatMoney(Math.round(value * 100), "MXN") : "—");
 const pct = (value: number | null, digits = 2) => (value === null || !Number.isFinite(value) ? "—" : formatPercent(value, digits, "auto"));
 
-/** Lee un número escrito con comas de miles; vacío o inválido = NaN. */
-const num = (text: string) => Number(text.replace(/,/g, "").trim() || "NaN");
-
-function NumberInput({ id, label, value, onChange, suffix }: { id: string; label: string; value: string; onChange: (value: string) => void; suffix?: string }) {
-  return (
-    <Field id={id} label={suffix ? `${label} (${suffix})` : label}>
-      <Input id={id} inputMode="decimal" autoComplete="off" value={value} onChange={(event) => onChange(event.target.value)} />
-    </Field>
-  );
-}
-
 function TimingToggle({ value, onChange }: { value: Timing; onChange: (value: Timing) => void }) {
   return (
     <div role="group" aria-label="Cuándo aportas" className="flex flex-wrap gap-2">
@@ -50,24 +40,6 @@ function TimingToggle({ value, onChange }: { value: Timing; onChange: (value: Ti
           Aporto al {option === "fin" ? "final" : "inicio"} del mes
         </button>
       ))}
-    </div>
-  );
-}
-
-function Result({ label, value, strong }: { label: string; value: ReactNode; strong?: boolean }) {
-  return (
-    <div className="flex items-baseline justify-between gap-3 py-1.5">
-      <dt className="text-interfaz text-texto-2">{label}</dt>
-      <dd className={cn("cifras text-right", strong ? "font-serif text-cifra font-semibold" : "text-interfaz")}>{value}</dd>
-    </div>
-  );
-}
-
-function Explain({ formula, children }: { formula: string; children: ReactNode }) {
-  return (
-    <div className="flex flex-col gap-1.5 rounded-control bg-fondo p-3">
-      <code className="overflow-x-auto whitespace-pre font-mono text-nota text-laton">{formula}</code>
-      <p className="text-etiqueta text-texto-2">{children}</p>
     </div>
   );
 }

@@ -188,20 +188,22 @@ export function PhotoField({
   busy,
   onPick,
   onRemove,
+  label = "Foto del ticket",
 }: {
   previewUrl: string | null;
   busy: boolean;
   onPick: (file: File) => void;
   onRemove: () => void;
+  label?: string;
 }) {
   const input = useRef<HTMLInputElement>(null);
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-etiqueta font-medium text-texto-2">Foto del ticket</span>
+      <span className="text-etiqueta font-medium text-texto-2">{label}</span>
       {previewUrl ? (
         <div className="flex items-start gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element -- foto local del dispositivo */}
-          <img src={previewUrl} alt="Foto del ticket" className="max-h-48 rounded-control border border-borde object-contain" />
+          <img src={previewUrl} alt={label} className="max-h-48 rounded-control border border-borde object-contain" />
           <button
             type="button"
             onClick={onRemove}
@@ -222,7 +224,7 @@ export function PhotoField({
         type="file"
         accept="image/*"
         className="sr-only"
-        aria-label="Elegir foto del ticket"
+        aria-label={`Elegir ${label.toLowerCase()}`}
         onChange={(event) => {
           const file = event.target.files?.[0];
           if (file) onPick(file);

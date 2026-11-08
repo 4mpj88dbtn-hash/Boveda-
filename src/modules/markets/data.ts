@@ -103,6 +103,15 @@ export function useSeries(id: string | null): DataState<SeriesFile> {
   return useDataFile(id ? `/datos/series/${id}.json` : null, parseSeries, 60 * 60_000);
 }
 
+/** Velas de 5 y 30 minutos de un activo, para revisar varios a la vez (simulador). */
+export async function fetchIntraday(id: string): Promise<IntradayFile | null> {
+  const path = `/datos/intradia/${id}.json`;
+  const current = cache.get(path) as DataState<IntradayFile> | undefined;
+  if (current?.data && Date.now() - current.loadedAt < 5 * 60_000) return current.data;
+  await load(path, parseIntraday);
+  return (cache.get(path) as DataState<IntradayFile> | undefined)?.data ?? null;
+}
+
 /** Para pantallas que necesitan varias series a la vez (comparador). */
 export async function fetchSeries(id: string): Promise<SeriesFile | null> {
   const path = `/datos/series/${id}.json`;

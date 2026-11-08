@@ -84,7 +84,8 @@ export function QuoteCard({ asset, quote }: { asset: Asset; quote: Quote | undef
   );
 }
 
-function statusText(status: MarketStatus): string {
+/** "Abierto. Cierra hoy a las 15:00." o "Cerrado (fin de semana). Abre el lun 09/11 a las 08:30.", en hora de Cancún. */
+export function statusText(status: MarketStatus): string {
   const at = TIME.format(status.nextChange);
   const day = DAY.format(status.nextChange).replace(".", "").replace(",", "");
   const sameDay = todayInCancun(status.nextChange) === todayInCancun();
