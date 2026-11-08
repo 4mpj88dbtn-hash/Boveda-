@@ -4,6 +4,7 @@ import { Panel } from "@/components/ui/panel";
 import { Greeting } from "@/modules/command-center/greeting";
 import { MonthPanel, NetWorthHeader } from "@/modules/finance/overview";
 import { TodayPanel } from "@/modules/finance/today-panel";
+import { PortfolioPanel } from "@/modules/investing/portfolio-panel";
 import { MarketsTicker } from "@/modules/markets/markets-ticker";
 import { NewsPanel, SignalsPanel } from "@/modules/signals/home-panels";
 
@@ -21,12 +22,7 @@ export default function CommandCenterPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
         <MonthPanel />
 
-        <Panel title="Portafolio S&P 500" action={<PhaseTag phase={4} />}>
-          <EmptyState
-            title="Sin compras registradas"
-            description="Aquí verás lo que has aportado, lo que vale hoy y tu rendimiento en USD y MXN."
-          />
-        </Panel>
+        <PortfolioPanel />
 
         <Panel title="Próximo pago" action={<PhaseTag phase={6} />} className="md:col-span-2 lg:col-span-1">
           <EmptyState

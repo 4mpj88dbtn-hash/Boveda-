@@ -15,6 +15,7 @@ on:
     paths:
       - "scripts/mercados/**"
       - "scripts/senales/**"
+      - "scripts/inversion/**"
       - "scripts/publicar-gh-pages.sh"
       - "src/modules/markets/catalogo.json"
       - ".github/workflows/mercados.yml"
@@ -59,6 +60,11 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
         run: node --experimental-strip-types --no-warnings scripts/senales/actualizar.mjs datos-publicados
+      - name: Fundamentales de empresas (una vez al día, con FINNHUB_API_KEY)
+        continue-on-error: true
+        env:
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+        run: node scripts/inversion/fundamentales.mjs datos-publicados
       - name: Publicar los datos
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
