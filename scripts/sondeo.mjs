@@ -1,23 +1,23 @@
 #!/usr/bin/env node
 /**
- * Sondeo temporal (se borra después): busca de dónde toma sus datos el calendario de Banxico.
+ * Sondeo temporal (se borra después): formato de los JSON mensuales del calendario de Banxico.
  */
 const UA = "Mozilla/5.0 (compatible; Boveda/1.0; +https://github.com/4mpj88dbtn-hash/Boveda-)";
 
-const respuesta = await fetch("https://www.banxico.org.mx/viewers2/JSP/calendarioDifusion_es.jsp", {
-  headers: { "User-Agent": UA },
-  signal: AbortSignal.timeout(20_000),
-});
-const html = new TextDecoder("latin1").decode(await respuesta.arrayBuffer()).replace(/\s+/g, " ");
-const patrones = [/url\s*[:=]/gi, /\.json/gi, /ajax/gi, /getJSON/gi, /fetch\(/gi, /\.do\b/gi, /servlet/gi, /service/gi, /src="[^"]+\.js"/gi];
-const vistos = new Set();
-for (const patron of patrones) {
-  for (const coincidencia of html.matchAll(patron)) {
-    const inicio = Math.max(0, (coincidencia.index ?? 0) - 160);
-    const fragmento = html.slice(inicio, inicio + 360);
-    const clave = fragmento.slice(100, 220);
-    if (vistos.has(clave)) continue;
-    vistos.add(clave);
-    console.log(`BANXICO[${patron.source}]>>> ${fragmento}`);
-  }
+async function texto(url, codificacion = "utf-8") {
+  const respuesta = await fetch(url, { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(20_000) });
+  const cuerpo = new TextDecoder(codificacion).decode(await respuesta.arrayBuffer());
+  return { estado: respuesta.status, tipo: respuesta.headers.get("content-type"), cuerpo };
+}
+
+const pagina = await texto("https://www.banxico.org.mx/viewers2/JSP/calendarioDifusion_es.jsp", "latin1");
+const canal = /gChannelURLString\s*=\s*"([^"]*)"/.exec(pagina.cuerpo)?.[1];
+console.log("CANAL>>>", canal);
+for (const mes of ["112026", "122026", "012027"]) {
+  const url = `https://www.banxico.org.mx/canales/${canal ?? "channels_"}${mes}_es.json`;
+  const respuesta = await texto(url);
+  console.log(`JSON ${mes} ${respuesta.estado} ${respuesta.tipo} ${respuesta.cuerpo.length}`);
+  console.log(`MUESTRA ${mes}>>>`, respuesta.cuerpo.replace(/\s+/g, " ").slice(0, 1500));
+  const monetaria = respuesta.cuerpo.replace(/\s+/g, " ").search(/pol[ií]tica monetaria/i);
+  if (monetaria >= 0) console.log(`MONETARIA ${mes}>>>`, respuesta.cuerpo.replace(/\s+/g, " ").slice(Math.max(0, monetaria - 400), monetaria + 400));
 }
