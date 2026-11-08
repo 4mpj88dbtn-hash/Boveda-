@@ -41,11 +41,20 @@ Desde ese momento, cada avance que se suba a GitHub se revisa y se publica solo 
 - **Más detalles** agrega nota, método de pago y etiquetas.
 - En **Finanzas** ves el historial del mes, buscas, filtras y tocas un movimiento para corregirlo o eliminarlo. En **Cuentas** agregas tus bancos y tarjetas con su saldo de hoy.
 
+### Practicar trading
+
+1. Abre **Trading → Simulador**. Tienes $10,000 dólares ficticios (los cambias en **Plan**).
+2. Toca **Nueva operación**, elige el activo y escribe tu **stop loss** (y tu objetivo). La app calcula cuántos títulos puedes comprar sin arriesgar más de tu regla (1% de inicio).
+3. Marca el checklist y toca **Abrir operación**. Cuando el precio toca tu stop o tu objetivo, se cierra sola; también puedes cerrarla tú.
+4. Al cerrar, completa tu **Diario**: si seguiste tu plan y qué aprendiste. En **Estadísticas** ves tus aciertos, tu esperanza y tu curva de capital.
+
+Si pierdes tu límite del día (3%) o de la semana (6%), el simulador no deja abrir más hasta el día o la semana siguiente. Practica al menos 2–3 meses con resultados consistentes antes de usar dinero real.
+
 ### Respaldos
 
 Tus datos existen solo en ese dispositivo. Si lo pierdes o se borran los datos del navegador, solo los recuperas con un respaldo.
 
-- **Ajustes → Descargar respaldo.** Incluye todo: cuentas, categorías, movimientos, presupuestos, recurrentes, tickets, compras de ETFs y dividendos. En el celular se abre el menú de compartir: guárdalo en Archivos, iCloud o Drive. Hazlo cada semana.
+- **Ajustes → Descargar respaldo.** Incluye todo: cuentas, categorías, movimientos, presupuestos, recurrentes, tickets, compras de ETFs, dividendos y tu diario de trading con sus capturas. En el celular se abre el menú de compartir: guárdalo en Archivos, iCloud o Drive. Hazlo cada semana.
 - **Ajustes → Restaurar respaldo** reemplaza los datos actuales por los del archivo. El respaldo nunca incluye tu PIN.
 - Para usar la app en otro dispositivo: descarga un respaldo en uno y restáuralo en el otro.
 
@@ -111,11 +120,11 @@ npm start            # la sirve en http://localhost:3000/Boveda-/
 
 ```
 src/app/            pantallas (las direcciones van en español: /finanzas/, /mercados/…)
-src/modules/        lógica por área: bloqueo con PIN, ajustes, Centro de mando, finanzas
+src/modules/        lógica por área: bloqueo, ajustes, Centro de mando, finanzas, mercados, señales, inversión y trading
 src/components/     componentes de interfaz y navegación
 src/lib/            dinero, fechas, base de datos local, PIN, respaldos
 public/sw.js        service worker (instalación y modo sin internet)
-scripts/            preparación del service worker y servidor local
+scripts/            datos de mercado, señales y fundamentales (GitHub Actions), service worker y servidor local
 tests/e2e/          pruebas de flujo completo
 docs/               requisitos, arquitectura y diseño
 ```

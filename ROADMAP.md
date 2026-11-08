@@ -13,7 +13,7 @@ Estado: ⬜ pendiente · 🟨 en curso · ✅ aprobada
 | 2 — Mercados | Watchlist, gráficas, comparador base 100, estado del mercado | Veo todos mis activos clave | ✅ |
 | 3 — Noticias y señales | Feed, calendario económico, avisos de mercado por Telegram, alertas en la app | Me llegan avisos de mercado al celular | ✅ |
 | 4 — Inversión S&P 500 | Portafolio, calculadoras, guía educativa, fundamentales | Controlo y entiendo mi inversión | ✅ |
-| 5 — Trading | Simulador, diario, estadísticas, calculadoras, guías | Practico con método | ⬜ |
+| 5 — Trading | Simulador, diario, estadísticas, calculadoras, guías | Practico con método | ✅ |
 | 6 — Pulido | Metas, deudas, tarjetas, suscripciones, exportación, IA opcional, recordatorio de respaldos, rendimiento | Versión completa | ⬜ |
 
 Las secciones citadas (§) se refieren a [`docs/REQUISITOS.md`](docs/REQUISITOS.md). La adaptación de cada función a una app sin servidor está en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md) §8. Donde los requisitos no dicen en qué fase va algo, la asignación es una propuesta y está marcada así: *(propuesta)*.
@@ -118,15 +118,19 @@ Las secciones citadas (§) se refieren a [`docs/REQUISITOS.md`](docs/REQUISITOS.
 - Límites: el P/E estimado y el historial de dividendos por empresa no vienen en el plan gratuito de Finnhub; el P/E del S&P 500 y el CAPE de Shiller no tienen fuente gratuita confiable (la guía enlaza multpl.com)
 - [ ] Tú: guardar `FINNHUB_API_KEY` en los secretos del repositorio para ver Empresas (pasos en el README)
 
-## Fase 5 — Trading ⬜
+## Fase 5 — Trading ✅
 
-**Entregable:** practico con método.
+**Entregable:** practico con método. Lista el 08/11/2026.
 
-- Simulador con capital ficticio y precios publicados (con su retraso indicado), con el aviso de riesgo de §5.1
-- Regla de riesgo de 1–2% y límites de pérdida diaria y semanal que bloquean nuevas operaciones
-- Diario de trading y estadísticas automáticas (§5.2)
-- Calculadoras de §5.3 con pruebas unitarias
-- Checklist, plan de trading, lecciones cortas y revisión semanal guiada (§5.4)
+- [x] Simulador con $10,000 USD ficticios (editable) y los precios que publica GitHub Actions, con su hora y antigüedad: ETFs y acciones de EE. UU. con la Bolsa de Nueva York abierta, cripto a toda hora. Stops y objetivos se revisan solos con las velas de 5 y 30 minutos (y diarias); si una vela toca los dos, cuenta el stop
+- [x] Aviso de riesgo de §5.1 siempre visible, con la fuente (ESMA, 27/03/2018: entre 74% y 89% de las cuentas minoristas de CFD perdían dinero) y la sugerencia de practicar 2–3 meses y usar máximo 5–10% del capital
+- [x] Regla de riesgo (1% por operación de inicio, máximo 2%): el tamaño de posición se calcula solo y no deja arriesgar de más. Límites de pérdida de 3% al día y 6% a la semana *(propuesta, editables)* que bloquean nuevas operaciones
+- [x] Checklist obligatorio antes de entrar (§5.4), con los datos fuertes del día tomados del calendario económico
+- [x] Diario (§5.2): activo, dirección, estrategia, entrada, stop, objetivo, tamaño, resultado en dinero y en R, captura de la gráfica, emoción, ¿seguí mi plan? y lección. También registra operaciones reales hechas en tu casa de bolsa
+- [x] Estadísticas automáticas: % de aciertos, ganancia y pérdida promedio, riesgo/beneficio real, esperanza, factor de beneficio, rachas, drawdown máximo, curva de capital y resultados por estrategia, día, hora, emoción y plan
+- [x] Las calculadoras de §5.3 con su fórmula y pruebas con casos verificados a mano
+- [x] Plan de trading escrito, 12 lecciones cortas y revisión semanal con preguntas guiadas
+- [x] Operaciones, capturas y revisiones entran en el respaldo (formato 5)
 
 ## Fase 6 — Pulido ⬜
 
