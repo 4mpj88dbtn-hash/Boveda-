@@ -231,7 +231,7 @@ export function OrderSheet({
           label={asset.tipo === "cripto" ? "Cantidad" : "Títulos"}
           hint={
             suggestion
-              ? `Con tu regla (${rules.riskPercent}% = ${formatMoney(suggestion.maxRiskCents, "USD")}) puedes ${suggestion.limitedBy === "riesgo" ? "arriesgar" : "pagar"} hasta ${formatQuantity(suggestion.quantity)}${suggestion.limitedBy === "efectivo" ? " (te limita el dinero disponible)" : ""}.`
+              ? `Con tu regla (${rules.riskPercent}% = ${formatMoney(suggestion.maxRiskCents, "USD")}) el máximo es ${formatQuantity(suggestion.quantity)}${suggestion.limitedBy === "efectivo" ? ", limitado por tu dinero disponible" : ""}.`
               : `Escribe tu stop y la app calcula el tamaño: máximo ${formatMoney(maxRiskCents(account.equityCents, rules.riskPercent), "USD")} de riesgo.`
           }
           error={qty !== "" && suggestion && !sizeOk ? sizeMessage(problem, decimalsOk, account.availableCents) : undefined}

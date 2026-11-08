@@ -11,14 +11,13 @@ import { formatMoney, formatPercent, roundHalfUp, type Currency } from "@/lib/mo
 import { useTrades, useTradingRules } from "./data";
 import { formatRatio } from "./lib/calculators";
 import { journalStats, outcomes, type Group } from "./lib/stats";
-import { AccountSwitch, Stat, useNow } from "./trading-ui";
+import { AccountSwitch, formatR, Stat, useNow } from "./trading-ui";
 import type { Trade, TradeAccount } from "./types";
 
 const DAY_MS = 86_400_000;
 const money = (cents: number, currency: Currency, sign = false) =>
   formatMoney(roundHalfUp(new Big(cents)), currency, { signDisplay: sign ? "exceptZero" : "auto" });
 const decimal = (value: number, digits = 2) => value.toLocaleString("es-MX", { minimumFractionDigits: digits, maximumFractionDigits: digits });
-const signedR = (value: number) => `${value >= 0 ? "+" : "−"}${decimal(Math.abs(value))} R`;
 
 /** Estadísticas automáticas del diario (§5.2). */
 export function StatsView() {
@@ -75,7 +74,7 @@ export function StatsView() {
               </Stat>
               <Stat label="Esperanza por operación" hint="Lo que esperas ganar en promedio por operación">
                 {stats.expectancyCents === null ? "—" : money(stats.expectancyCents, currency, true)}
-                {stats.averageR !== null ? <span className="block text-nota text-texto-2">{signedR(stats.averageR)}</span> : null}
+                {stats.averageR !== null ? <span className="block text-nota text-texto-2">{formatR(stats.averageR)}</span> : null}
               </Stat>
               <Stat label="Factor de beneficio" hint="Arriba de 1, ganas más de lo que pierdes">
                 {stats.profitFactor === null ? (stats.grossProfitCents > 0 ? "Sin pérdidas" : "—") : decimal(stats.profitFactor)}

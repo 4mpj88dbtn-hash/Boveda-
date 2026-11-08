@@ -14,7 +14,7 @@ import { formatMoney, parseAmountToCents } from "@/lib/money";
 import { Chip, PhotoField } from "@/modules/finance/transaction-fields";
 import { deleteTrade, putTrade, restoreTrade, setTradeImage, useTradeImage, useTradingRules } from "./data";
 import { closedPnlCents, initialRiskCents, rMultiple } from "./lib/trades";
-import { formatInstant, formatPrice, formatQuantity } from "./trading-ui";
+import { formatInstant, formatPrice, formatQuantity, formatR, unitsLabel } from "./trading-ui";
 import {
   DECIMAL_PATTERN,
   DIRECTION_LABELS,
@@ -212,7 +212,7 @@ export function TradeSheet({ trade, onClose }: { trade: Trade | null; onClose: (
           <div className="flex flex-col gap-1 rounded-control border border-borde px-3 py-2 text-etiqueta">
             <p className="flex items-baseline justify-between gap-3 text-interfaz">
               <span className="font-medium">
-                {DIRECTION_LABELS[trade.direction]} · {formatQuantity(trade.quantity)} títulos
+                {DIRECTION_LABELS[trade.direction]} · {formatQuantity(trade.quantity)} {unitsLabel(trade)}
               </span>
               {pnl !== null ? <Amount cents={pnl} currency={trade.currency} tone="variacion" className="font-medium" /> : <span className="text-texto-2">Abierta</span>}
             </p>
@@ -223,7 +223,7 @@ export function TradeSheet({ trade, onClose }: { trade: Trade | null; onClose: (
             {trade.exitPrice && trade.closedAt ? (
               <p className="text-texto-2">
                 {trade.exitReason ? EXIT_REASON_LABELS[trade.exitReason] : "Salida"}: {formatPrice(trade.exitPrice, trade.currency)} el {formatInstant(trade.closedAt)}
-                {r !== null ? ` · ${r >= 0 ? "+" : "−"}${Math.abs(r).toLocaleString("es-MX", { maximumFractionDigits: 2 })} R` : ""}
+                {r !== null ? ` · ${formatR(r)}` : ""}
               </p>
             ) : (
               <p className="text-texto-2">Se cierra desde el Simulador o sola al tocar el stop o el objetivo.</p>

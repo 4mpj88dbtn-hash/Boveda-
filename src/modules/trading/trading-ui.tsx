@@ -7,6 +7,7 @@ import { showToast } from "@/components/ui/toast";
 import { APP_TIME_ZONE } from "@/lib/dates";
 import type { Currency } from "@/lib/money";
 import { cn } from "@/lib/utils";
+import { assetById } from "@/modules/markets/catalog";
 import { fetchIntraday, fetchSeries } from "@/modules/markets/data";
 import { nyseStatus } from "@/modules/markets/lib/market-hours";
 import { statusText } from "@/modules/markets/market-ui";
@@ -93,6 +94,17 @@ const number = (digits: number) => new Intl.NumberFormat("es-MX", { minimumFract
 export function formatPrice(text: string, currency: Currency): string {
   const formatted = number(6).format(text as Intl.StringNumericLiteral);
   return currency === "USD" ? `USD ${formatted}` : `$${formatted}`;
+}
+
+/** Resultado en R: "+2 R", "−0.5 R" o "0 R". */
+export function formatR(r: number): string {
+  if (r === 0) return "0 R";
+  return `${r > 0 ? "+" : "−"}${Math.abs(r).toLocaleString("es-MX", { maximumFractionDigits: 2 })} R`;
+}
+
+/** "títulos" en acciones y ETFs; "unidades" en cripto. */
+export function unitsLabel(trade: Pick<Trade, "assetId">): string {
+  return trade.assetId && assetById(trade.assetId)?.tipo === "cripto" ? "unidades" : "títulos";
 }
 
 /** Títulos: "50" o "0.052". */

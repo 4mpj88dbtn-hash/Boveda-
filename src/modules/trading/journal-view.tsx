@@ -9,7 +9,7 @@ import { Panel } from "@/components/ui/panel";
 import { useTrades, useTradingRules } from "./data";
 import { closedPnlCents, initialRiskCents, rMultiple } from "./lib/trades";
 import { TradeSheet } from "./trade-sheet";
-import { AccountSwitch, formatInstant, formatPrice, formatQuantity } from "./trading-ui";
+import { AccountSwitch, formatInstant, formatPrice, formatQuantity, formatR } from "./trading-ui";
 import { DIRECTION_LABELS, EMOTION_LABELS, type Trade, type TradeAccount } from "./types";
 
 type Editing = { trade: Trade | null } | null;
@@ -111,12 +111,7 @@ function TradeList({ trades, onOpen }: { trades: Trade[]; onOpen: (trade: Trade)
                 ) : (
                   <Amount cents={pnl} currency={trade.currency} tone="variacion" className="text-interfaz font-medium" />
                 )}
-                {r !== null ? (
-                  <span className="cifras text-nota text-texto-2">
-                    {r >= 0 ? "+" : "−"}
-                    {Math.abs(r).toLocaleString("es-MX", { maximumFractionDigits: 2 })} R
-                  </span>
-                ) : null}
+                {r !== null ? <span className="cifras text-nota text-texto-2">{formatR(r)}</span> : null}
               </span>
             </button>
           </li>

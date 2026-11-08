@@ -19,7 +19,7 @@ import { closedPnlCents, initialRiskCents, lossLimits, maxRiskCents, priceText, 
 import { OrderSheet } from "./order-sheet";
 import { tradability, TRADABLE_ASSETS, type Tradability } from "./simulator";
 import { TradeSheet } from "./trade-sheet";
-import { formatInstant, formatPrice, formatQuantity, Stat, tradabilityText, useNow } from "./trading-ui";
+import { formatInstant, formatPrice, formatQuantity, formatR, Stat, tradabilityText, unitsLabel, useNow } from "./trading-ui";
 import { DIRECTION_LABELS, EXIT_REASON_LABELS, type Trade } from "./types";
 
 /** Simulador con capital ficticio y los precios que publica GitHub Actions (§5.1). */
@@ -183,7 +183,10 @@ function OpenPosition({ trade, quote, status, now, onClose }: { trade: Trade; qu
     <li className="flex flex-col gap-2 py-3">
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-interfaz font-medium">
-          {trade.symbol} <span className="font-normal text-texto-2">· {DIRECTION_LABELS[trade.direction]} · {formatQuantity(trade.quantity)} títulos</span>
+          {trade.symbol}{" "}
+          <span className="font-normal text-texto-2">
+            · {DIRECTION_LABELS[trade.direction]} · {formatQuantity(trade.quantity)} {unitsLabel(trade)}
+          </span>
         </span>
         {pnl === null ? <span className="text-texto-2">—</span> : <Amount cents={pnl} currency="USD" tone="variacion" className="text-interfaz font-medium" />}
       </div>
@@ -208,7 +211,7 @@ function OpenPosition({ trade, quote, status, now, onClose }: { trade: Trade; qu
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-nota text-texto-2">
           Desde {formatInstant(trade.openedAt)} · Arriesgas {formatMoney(risk, "USD")}
-          {r !== null ? ` · ${r >= 0 ? "+" : "−"}${Math.abs(r).toLocaleString("es-MX", { maximumFractionDigits: 2 })} R` : ""}
+          {r !== null ? ` · ${formatR(r)}` : ""}
           {quote?.hora ? ` · Precio ${formatAge(quote.hora, now)}` : ""}
         </span>
         <Button variant="secundario" onClick={onClose} disabled={!status.ok} aria-label={`Cerrar ${trade.symbol} al precio actual`}>
@@ -222,8 +225,8 @@ function OpenPosition({ trade, quote, status, now, onClose }: { trade: Trade; qu
 
 function LimitsBlock({ limits, rules }: { limits: LossLimits; rules: { dailyLossPercent: number; weeklyLossPercent: number } }) {
   const rows = [
-    { label: `Pérdida del día (límite ${rules.dailyLossPercent}%)`, state: limits.day },
-    { label: `Pérdida de la semana (límite ${rules.weeklyLossPercent}%)`, state: limits.week },
+    { label: `Pérdida hoy · límite ${rules.dailyLossPercent}%`, state: limits.day },
+    { label: `Pérdida semanal · límite ${rules.weeklyLossPercent}%`, state: limits.week },
   ];
   return (
     <div className="flex flex-col gap-2">
@@ -233,8 +236,8 @@ function LimitsBlock({ limits, rules }: { limits: LossLimits; rules: { dailyLoss
           <div key={label} className="flex flex-col gap-1">
             <div className="flex items-baseline justify-between gap-3 text-etiqueta">
               <span className="text-texto-2">{label}</span>
-              <span className="cifras">
-                {state.pnlCents < 0 ? formatMoney(state.pnlCents, "USD") : formatMoney(0, "USD")} de −{formatMoney(state.limitCents, "USD")}
+              <span className="cifras whitespace-nowrap">
+                {formatMoney(Math.max(0, -state.pnlCents), "USD")} de {formatMoney(state.limitCents, "USD")}
               </span>
             </div>
             <div
