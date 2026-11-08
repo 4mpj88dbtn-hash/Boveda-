@@ -1,0 +1,35 @@
+1:"$Sreact.fragment"
+2:"/Boveda-/_next/static/chunks/3y0h7m1rg3bhe.js"
+3:I[39756,["$2"],"default"]
+4:I[37457,["$2"],"default"]
+5:"/Boveda-/_next/static/chunks/3zt_16xndew4w.js"
+6:I[22016,["$2","$5"],""]
+7:"ServiceWorkerRegistration"
+8:I[66790,["$2"],"$7"]
+f:"/Boveda-/_next/static/chunks/3q9rpe8tx0wej.js"
+10:"/Boveda-/_next/static/chunks/0lew9razgs9aj.js"
+11:I[5014,["$2","$f","$10"],"default"]
+12:I[78855,["$2","$f","$10"],"RetryButton"]
+13:I[97367,["$2"],"OutletBoundary"]
+14:"$Sreact.suspense"
+17:"ViewportBoundary"
+18:I[97367,["$2"],"$17"]
+19:"MetadataBoundary"
+1a:I[97367,["$2"],"$19"]
+1b:I[27201,["$2"],"IconMark"]
+:HL["/Boveda-/_next/static/chunks/2kqy8pbhwymdr.css","style"]
+a:X
+d:X
+d:C
+e:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$1","c",{"children":[["$","main",null,{"className":"mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center gap-6 px-[max(16px,env(safe-area-inset-left))] py-12","children":[["$","p",null,{"className":"font-serif text-titulo font-semibold text-laton","children":"Bóveda"}],["$","$L11",null,{"icon":{"name":"wifi-off","size":24,"node":[["path",{"d":"M12 20h.01","key":"zekei9"}],["path",{"d":"M8.5 16.429a5 5 0 0 1 7 0","key":"1bycff"}],["path",{"d":"M5 12.859a10 10 0 0 1 5.17-2.69","key":"1dl1wf"}],["path",{"d":"M19 12.859a10 10 0 0 0-2.007-1.523","key":"4k23kn"}],["path",{"d":"M2 8.82a15 15 0 0 1 4.177-2.643","key":"1grhjp"}],["path",{"d":"M22 8.82a15 15 0 0 0-11.288-3.764","key":"z3jwby"}],["path",{"d":"m2 2 20 20","key":"1ooewy"}]]},"className":"size-8 text-texto-2","aria-hidden":true,"strokeWidth":1.6}],["$","div",null,{"className":"flex flex-col gap-2","children":[["$","h1",null,{"className":"text-display","children":"Sin conexión"}],["$","p",null,{"className":"text-interfaz text-texto-2","children":"Revisa tu internet y vuelve a intentar. Desde la Fase 1 podrás registrar gastos sin conexión y se subirán solos cuando vuelva la señal."}]]}],["$","$L12",null,{}]]}],[["$","script","script-0",{"src":"/Boveda-/_next/static/chunks/3q9rpe8tx0wej.js","async":true}],["$","script","script-1",{"src":"/Boveda-/_next/static/chunks/0lew9razgs9aj.js","async":true}]],["$","$L13",null,{"children":["$","$14",null,{"name":"Next.MetadataOutlet","children":"$@15"}]}]]}],"p":"$@16","v":null,"s":"$a"}}]]
+b:[["children",{"s":"sin-conexion","h":96,"d":{"r":["$","$1","c",{"children":[null,["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}]}]]}],"p":"$@c","v":"$d","s":"$a"},"c":"$Qe"}]]
+0:{"t":{"t":{"s":"","h":80,"d":{"r":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/Boveda-/_next/static/chunks/2kqy8pbhwymdr.css","precedence":"next"}],["$","script","script-0",{"src":"/Boveda-/_next/static/chunks/3y0h7m1rg3bhe.js","async":true}]],["$","html",null,{"lang":"es-MX","className":"axtrJa_variable cjej8W_variable","suppressHydrationWarning":true,"children":["$","body",null,{"children":[["$","meta",null,{"httpEquiv":"Content-Security-Policy","content":"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"}],["$","meta",null,{"name":"referrer","content":"strict-origin-when-cross-origin"}],["$","script",null,{"type":"text/javascript","suppressHydrationWarning":true,"dangerouslySetInnerHTML":{"__html":"try{if(sessionStorage.getItem(\"boveda:secuencia-mando\"))document.documentElement.setAttribute(\"data-secuencia-vista\",\"\")}catch(e){}"}}],["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}],"notFound":[["$","main",null,{"className":"mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center gap-6 px-[max(16px,env(safe-area-inset-left))] py-12","children":[["$","p",null,{"className":"font-serif text-titulo font-semibold text-laton","children":"Bóveda"}],["$","div",null,{"className":"flex flex-col gap-2","children":[["$","h1",null,{"className":"text-display","children":"Esta página no existe"}],["$","p",null,{"className":"text-interfaz text-texto-2","children":"Revisa la dirección o vuelve al Centro de mando."}]]}],["$","$L6",null,{"href":"/","className":"inline-flex select-none items-center justify-center gap-2 rounded-control font-sans font-semibold transition-[background-color,border-color,color,filter] duration-120 ease-boveda disabled:pointer-events-none disabled:opacity-50 bg-laton text-sobre-laton hover:brightness-110 active:brightness-95 h-12 px-5 text-cuerpo","children":"Ir al Centro de mando"}]]}],[]]}],["$","$L8",null,{}]]}]}]]}],"p":"$@9","v":null,"s":"$a"},"c":"$Qb"},"h":{"r":["$","$1","h",{"children":[null,["$","$L18",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1, viewport-fit=cover"}],["$","meta","2",{"name":"theme-color","content":"#0d0f12"}],["$","meta","3",{"name":"color-scheme","content":"dark"}]]}],["$","$L1a",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$14",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Sin conexión · Bóveda"}],["$","meta","1",{"name":"description","content":"Tus finanzas, tu inversión y los mercados en un solo lugar."}],["$","meta","2",{"name":"application-name","content":"Bóveda"}],["$","link","3",{"rel":"manifest","href":"/Boveda-/manifest.webmanifest"}],["$","meta","4",{"name":"robots","content":"noindex, nofollow"}],["$","meta","5",{"name":"format-detection","content":"telephone=no"}],["$","meta","6",{"name":"mobile-web-app-capable","content":"yes"}],["$","meta","7",{"name":"apple-mobile-web-app-title","content":"Bóveda"}],["$","meta","8",{"name":"apple-mobile-web-app-status-bar-style","content":"black-translucent"}],["$","link","9",{"rel":"icon","href":"/Boveda-/icon.svg?icon.3fpu1516bclfk.svg","sizes":"any","type":"image/svg+xml"}],["$","link","10",{"rel":"apple-touch-icon","href":"/Boveda-/apple-icon.png?apple-icon.0vpskizptoif1.png","sizes":"180x180","type":"image/png"}],["$","$L1b","11",{}]]}]}],null]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"p":"$@1c","v":null,"s":"$a"}},"a":"$@1d","u":"$@1e","b":"oP2FckIHgfVxzDCgTgF9e"}
+15:null
+a:300
+1e:true
+a:C
+1d:0
+c:"$undefined"
+9:"$undefined"
+1c:"$undefined"
+16:"$undefined"
