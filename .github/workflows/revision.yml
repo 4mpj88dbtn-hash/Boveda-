@@ -75,15 +75,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - name: Subir la app a la rama gh-pages
+      - name: Subir la app a la rama gh-pages (conserva los datos de mercado)
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cd out
-          touch .nojekyll
-          git init -q -b gh-pages
-          git add -A
-          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-            commit -q -m "Publicación de ${GITHUB_REF_NAME} (${GITHUB_SHA::7})"
-          git push -q -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
+          bash scripts/publicar-gh-pages.sh app out "Publicación de ${GITHUB_REF_NAME} (${GITHUB_SHA::7})"
           echo "::notice::App publicada desde ${GITHUB_REF_NAME}. Dirección: https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/"

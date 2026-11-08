@@ -1,0 +1,51 @@
+# Baja precios de mercado y los publica en GitHub Pages junto a la app (carpeta datos/).
+# Los horarios programados solo corren desde la rama principal (main).
+name: Datos de mercado
+
+on:
+  schedule:
+    # Cada 20 minutos en horario de mercado de EE. UU. (en UTC), de lunes a viernes.
+    - cron: "*/20 13-21 * * 1-5"
+    # Cada 3 horas el resto del tiempo (cripto opera todos los días).
+    - cron: "40 */3 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main, "fase-*"]
+    paths:
+      - "scripts/mercados/**"
+      - "scripts/publicar-gh-pages.sh"
+      - "src/modules/markets/catalogo.json"
+      - ".github/workflows/mercados.yml"
+
+concurrency:
+  group: datos-mercado
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  actualizar:
+    name: Bajar precios y publicarlos
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: Traer los datos ya publicados
+        run: |
+          mkdir -p datos-publicados
+          if git fetch -q --depth=1 origin gh-pages; then
+            git archive FETCH_HEAD datos 2>/dev/null | tar -x -C datos-publicados --strip-components=1 || true
+          fi
+      - name: Bajar precios
+        env:
+          BANXICO_TOKEN: ${{ secrets.BANXICO_TOKEN }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: node scripts/mercados/actualizar.mjs datos-publicados
+      - name: Publicar los datos
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/publicar-gh-pages.sh datos datos-publicados "Datos de mercado $(date -u +%Y-%m-%dT%H:%MZ)"
