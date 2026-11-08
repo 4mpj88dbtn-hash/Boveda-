@@ -46,9 +46,9 @@ Una app web instalable que guarda todo en tu dispositivo (IndexedDB), protegida 
 ## 4. Tus datos
 
 - Viven solo en el navegador del dispositivo donde usas la app. No hay copia en ningún servidor.
-- Tablas (`src/lib/db.ts`): `settings` (versión 1), y desde la versión 2 `accounts`, `categories` y `transactions`. Al pasar de la versión 1 a la 2 se conservan los ajustes y se agregan las categorías y la cuenta Efectivo de inicio (prueba en `src/lib/db.test.ts`).
+- Tablas (`src/lib/db.ts`): `settings` (versión 1); desde la versión 2 `accounts`, `categories` y `transactions`; desde la 3 `budgets`, `recurring`, `templates` y `attachments` (tickets); desde la 4 `purchases` (compras de ETFs) y `dividends`. Al pasar de la versión 1 a la 2 se conservan los ajustes y se agregan las categorías y la cuenta Efectivo de inicio (prueba en `src/lib/db.test.ts`).
 - Montos en centavos enteros con su moneda; cada movimiento en dólares guarda su tipo de cambio, su fuente y su fecha. El saldo de una cuenta se calcula: saldo inicial más sus movimientos.
-- **Respaldos:** Ajustes → Descargar respaldo crea un archivo `.json` con todo (menos el PIN). Formato versión 2 desde la Fase 1; los respaldos de la Fase 0 se siguen leyendo. Antes de restaurar se revisa que cada movimiento apunte a cuentas y categorías que existan; la restauración es todo o nada. En el celular abre el menú de compartir para guardarlo en Archivos, iCloud o Drive. Restaurar reemplaza los datos actuales por los del archivo.
+- **Respaldos:** Ajustes → Descargar respaldo crea un archivo `.json` con todo (menos el PIN). Formato versión 4 desde la Fase 4 (todas las tablas); los respaldos anteriores se siguen leyendo. Antes de restaurar se revisa que cada movimiento apunte a cuentas y categorías que existan; la restauración es todo o nada. En el celular abre el menú de compartir para guardarlo en Archivos, iCloud o Drive. Restaurar reemplaza los datos actuales por los del archivo.
 - **Riesgo de pérdida:** si pierdes el dispositivo o se borran los datos del navegador, solo los recuperas con un respaldo. En iPhone, Safari borra los datos de sitios que no abres en 7 días; las apps agregadas a la pantalla de inicio llevan su propia cuenta de días, pero hay reportes de borrados. Por eso: instalar la app y respaldar cada semana.
 - La app pide al navegador que marque los datos como permanentes (`navigator.storage.persist()`) y muestra en Ajustes si lo concedió.
 - **Sincronización:** no hay. Cada dispositivo tiene sus propios datos; para pasar datos de uno a otro se usa un respaldo.
@@ -86,7 +86,7 @@ La ruta base es `/Boveda-` (el nombre del repositorio). Los enlaces de Next la a
 | Noticias y calendario (Fase 3) | Hecho: `scripts/senales/actualizar.mjs` (mismo flujo de GitHub Actions, después de los precios) escribe `datos/noticias.json`, `datos/calendario.json`, `datos/senales.json` (avisos públicos) y `datos/senales-estado.json` (qué ya se avisó; las alertas personales van con clave cifrada por hash) |
 | Avisos por Telegram (Fase 3) | Los de mercado (pre-apertura, cierre, movimientos fuertes) sí, desde GitHub Actions. Los que usan tus datos (presupuestos, pagos, resúmenes) se ven al abrir la app; se puede enviar a Telegram desde la app a mano |
 | Notificaciones push | Evaluado el 08/11/2026: no por ahora. Web Push necesita guardar la suscripción de cada dispositivo en un servicio; sin servidor, Telegram cubre los avisos |
-| Portafolio, calculadoras, guía (Fase 4) | Igual, en el dispositivo. Los datos históricos vienen de los JSON de GitHub Actions |
+| Portafolio, calculadoras, guía (Fase 4) | Hecho: compras, dividendos y cálculos en el dispositivo; el simulador usa `datos/series/sp500tr.json`. `scripts/inversion/fundamentales.mjs` (mismo flujo de GitHub Actions, una vez al día, con `FINNHUB_API_KEY`) escribe `datos/fundamentales.json` |
 | Trading simulado (Fase 5) | Igual, con precios con retraso |
 | Observaciones con IA (Fase 6) | Requieren una clave de API. Sin servidor, la opción sería que escribas tu propia clave en la app (vive solo en tu dispositivo). Se decide en la Fase 6 |
 | Respaldo automático (Fase 6) | Recordatorio semanal para descargar el respaldo; no hay copia automática en la nube |
@@ -108,6 +108,8 @@ La ruta base es `/Boveda-` (el nombre del repositorio). Los enlaces de Next la a
 | FIX, tasa objetivo | Banxico SIE (series SF43718 y SF61745) | Token gratuito `BANXICO_TOKEN` | Banxico pide token en cada consulta |
 | Tasa de la Fed | FRED (serie DFEDTARU) | Clave gratuita `FRED_API_KEY` | |
 | Festivos NYSE | Reglas de la NYSE, comparadas con su calendario oficial 2026–2027 | — | Un cierre extraordinario no se puede prever |
+| S&P 500 con dividendos reinvertidos | Yahoo Finance (^SP500TR) | No | Para el simulador histórico |
+| Indicadores de empresas | Finnhub (`/stock/metric` y `/stock/profile2`) | Clave gratuita `FINNHUB_API_KEY` | Una vez al día; 21 empresas, dentro del límite de 60 consultas por minuto |
 
 ## 11. Fuentes consultadas (05/11/2026)
 

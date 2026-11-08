@@ -45,7 +45,7 @@ Desde ese momento, cada avance que se suba a GitHub se revisa y se publica solo 
 
 Tus datos existen solo en ese dispositivo. Si lo pierdes o se borran los datos del navegador, solo los recuperas con un respaldo.
 
-- **Ajustes → Descargar respaldo.** Incluye tus cuentas, categorías y movimientos. En el celular se abre el menú de compartir: guárdalo en Archivos, iCloud o Drive. Hazlo cada semana.
+- **Ajustes → Descargar respaldo.** Incluye todo: cuentas, categorías, movimientos, presupuestos, recurrentes, tickets, compras de ETFs y dividendos. En el celular se abre el menú de compartir: guárdalo en Archivos, iCloud o Drive. Hazlo cada semana.
 - **Ajustes → Restaurar respaldo** reemplaza los datos actuales por los del archivo. El respaldo nunca incluye tu PIN.
 - Para usar la app en otro dispositivo: descarga un respaldo en uno y restáuralo en el otro.
 
@@ -63,7 +63,7 @@ Los precios de mercado funcionan sin claves (Yahoo Finance y Coinbase). Tres dat
 2. **`BANXICO_TOKEN`** (FIX y tasa objetivo de Banxico): pide el token en https://www.banxico.org.mx/SieAPIRest/service/v1/token.
 3. **`FRED_API_KEY`** (tasa de la Fed): crea una cuenta en https://fred.stlouisfed.org y pide una API key en tu perfil.
 
-4. **`FINNHUB_API_KEY`** (opcional, fechas de resultados de Apple, Microsoft, NVIDIA y otras): crea una cuenta gratuita en https://finnhub.io.
+4. **`FINNHUB_API_KEY`** (opcional): activa **Inversión → Empresas** (semáforo de 21 empresas grandes) y las fechas de resultados de Apple, Microsoft, NVIDIA y otras en el calendario. Crea una cuenta gratuita en https://finnhub.io y copia tu API key.
 
 La siguiente actualización (máximo 20 minutos en horario de mercado) ya los incluye.
 

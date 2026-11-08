@@ -12,7 +12,7 @@ Estado: ⬜ pendiente · 🟨 en curso · ✅ aprobada
 | 1 — Finanzas | Registro rápido, categorías, cuentas, historial, resúmenes semanal y mensual, presupuestos | Ya puedo usarla a diario | ✅ |
 | 2 — Mercados | Watchlist, gráficas, comparador base 100, estado del mercado | Veo todos mis activos clave | ✅ |
 | 3 — Noticias y señales | Feed, calendario económico, avisos de mercado por Telegram, alertas en la app | Me llegan avisos de mercado al celular | ✅ |
-| 4 — Inversión S&P 500 | Portafolio, calculadoras, guía educativa, fundamentales | Controlo y entiendo mi inversión | ⬜ |
+| 4 — Inversión S&P 500 | Portafolio, calculadoras, guía educativa, fundamentales | Controlo y entiendo mi inversión | ✅ |
 | 5 — Trading | Simulador, diario, estadísticas, calculadoras, guías | Practico con método | ⬜ |
 | 6 — Pulido | Metas, deudas, tarjetas, suscripciones, exportación, IA opcional, recordatorio de respaldos, rendimiento | Versión completa | ⬜ |
 
@@ -105,15 +105,18 @@ Las secciones citadas (§) se refieren a [`docs/REQUISITOS.md`](docs/REQUISITOS.
 - [x] Notificaciones push del navegador: evaluadas y descartadas por ahora (necesitan un servicio que guarde tu suscripción); Telegram cubre los avisos
 - [ ] Tú: crear el bot y guardar `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` y la variable `SENALES_CONFIG` (pasos en Señales y en el README)
 
-## Fase 4 — Inversión S&P 500 ⬜
+## Fase 4 — Inversión S&P 500 ✅
 
-**Entregable:** controlo y entiendo mi inversión.
+**Entregable:** controlo y entiendo mi inversión. Lista el 08/11/2026.
 
-- Portafolio (§4.1) con XIRR, ganancia separada entre mercado y tipo de cambio, y constancia
-- Las 10 calculadoras de §4.2, cada una con su fórmula, una explicación sencilla y pruebas unitarias
-- Simulador histórico con datos reales publicados por GitHub Actions
-- Guía para principiantes (§4.3), con la sección de impuestos citada, fechada y con "verifica con tu contador"
-- Análisis fundamental con semáforo (§4.4) para una lista de empresas que se actualiza en GitHub Actions
+- [x] Portafolio (§4.1): compras con fecha, ETF (VOO, IVV, SPY y otros 7), títulos con fracciones, precio, comisión y tipo de cambio; dividendos recibidos. Muestra aportado, valor de hoy, ganancia en USD y MXN separada entre mercado y tipo de cambio, costo promedio, rendimiento total, XIRR, dividendos, gráfica "aportado vs lo que vale" y meses seguidos invirtiendo
+- [x] Las 10 calculadoras de §4.2, cada una con su fórmula, explicación sencilla y pruebas con casos verificados a mano
+- [x] Simulador histórico con la serie del S&P 500 con dividendos reinvertidos (^SP500TR, Yahoo Finance), publicada por GitHub Actions
+- [x] Guía (§4.3): S&P 500, ETFs y sus comisiones (revisadas el 08/11/2026), cómo invertir desde México, DCA, reglas de oro, riesgo cambiario, impuestos citados y fechados con tasa editable y "verifica con tu contador", indicadores del momento y glosario con búsqueda
+- [x] Empresas (§4.4): 21 empresas grandes con semáforo contra la mediana de su sector (o de la lista) en valuación, rentabilidad, crecimiento, salud financiera y dividendos, actualizadas una vez al día por GitHub Actions con Finnhub
+- [x] Portafolio en el Centro de mando; compras y dividendos entran en el respaldo (formato 4)
+- Límites: el P/E estimado y el historial de dividendos por empresa no vienen en el plan gratuito de Finnhub; el P/E del S&P 500 y el CAPE de Shiller no tienen fuente gratuita confiable (la guía enlaza multpl.com)
+- [ ] Tú: guardar `FINNHUB_API_KEY` en los secretos del repositorio para ver Empresas (pasos en el README)
 
 ## Fase 5 — Trading ⬜
 
