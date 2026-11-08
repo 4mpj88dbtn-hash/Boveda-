@@ -1,0 +1,18 @@
+# Temporal: prueba qué fuentes públicas responden desde GitHub Actions. Se borra después.
+name: Sondeo de fuentes
+on:
+  push:
+    branches: ["fase-*"]
+    paths: ["scripts/sondeo.mjs", ".github/workflows/sondeo.yml"]
+permissions:
+  contents: read
+jobs:
+  sondeo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: node scripts/sondeo.mjs
