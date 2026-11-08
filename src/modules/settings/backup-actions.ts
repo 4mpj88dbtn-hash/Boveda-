@@ -9,7 +9,7 @@ import { parseSetting, setSetting, SETTING_KEYS, type SettingKey } from "@/lib/s
 export async function downloadBackup(): Promise<"compartido" | "descargado" | "cancelado"> {
   const now = new Date();
   const db = getDb();
-  const [settings, accounts, categories, transactions, budgets, recurring, templates, attachments] = await Promise.all([
+  const [settings, accounts, categories, transactions, budgets, recurring, templates, attachments, purchases, dividends] = await Promise.all([
     db.settings.toArray(),
     db.accounts.toArray(),
     db.categories.toArray(),
@@ -18,9 +18,11 @@ export async function downloadBackup(): Promise<"compartido" | "descargado" | "c
     db.recurring.toArray(),
     db.templates.toArray(),
     db.attachments.toArray(),
+    db.purchases.toArray(),
+    db.dividends.toArray(),
   ]);
   const backup = buildBackup(
-    { settings, accounts, categories, transactions, budgets, recurring, templates, attachments },
+    { settings, accounts, categories, transactions, budgets, recurring, templates, attachments, purchases, dividends },
     now,
   );
   const file = new File([JSON.stringify(backup, null, 2)], backupFileName(now), { type: "application/json" });
@@ -47,6 +49,8 @@ export async function restoreBackup(backup: BackupFile): Promise<void> {
     db.recurring,
     db.templates,
     db.attachments,
+    db.purchases,
+    db.dividends,
   ];
   await db.transaction("rw", tables, async () => {
     await db.settings.bulkDelete(RESTORABLE_KEYS);
@@ -64,5 +68,7 @@ export async function restoreBackup(backup: BackupFile): Promise<void> {
     await db.recurring.bulkPut(data.recurring);
     await db.templates.bulkPut(data.templates);
     await db.attachments.bulkPut(data.attachments);
+    await db.purchases.bulkPut(data.purchases);
+    await db.dividends.bulkPut(data.dividends);
   });
 }

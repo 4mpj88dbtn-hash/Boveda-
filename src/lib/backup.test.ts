@@ -21,6 +21,21 @@ const tables: BackupTables = {
   budgets: [{ categoryId: "gasto-comida", amountCents: 400_000, createdAt: 1, updatedAt: 1 }],
   recurring: [],
   templates: [],
+  purchases: [
+    {
+      id: "c1",
+      date: "2026-10-01",
+      assetId: "voo",
+      shares: "0.512345",
+      priceUsd: "612.35",
+      fxRate: "18.45",
+      commissionCents: 0,
+      commissionCurrency: "MXN",
+      note: "",
+      createdAt: 1,
+    },
+  ],
+  dividends: [],
   attachments: [
     {
       id: "foto-1",
@@ -40,7 +55,7 @@ describe("buildBackup", () => {
   it("incluye tus datos pero nunca el PIN ni los intentos fallidos", () => {
     const backup = buildBackup(tables, NOW);
     expect(backup.app).toBe("boveda");
-    expect(backup.version).toBe(3);
+    expect(backup.version).toBe(4);
     expect(backup.data.attachments[0]?.dataBase64).toBe("/9j/AAEC");
     expect(backup.exportedAt).toBe("2026-11-05T15:00:00.000Z");
     expect(backup.data.settings.map((row) => row.key)).toEqual(["displayName", "lockPolicy"]);

@@ -144,7 +144,7 @@ test("el respaldo guarda los movimientos y los restaura", async ({ page }) => {
   await page.getByRole("button", { name: "Descargar respaldo" }).click();
   const file = await (await downloadPromise).path();
   const backup = JSON.parse(await readFile(file, "utf8"));
-  expect(backup.version).toBe(3);
+  expect(backup.version).toBe(4);
   expect(backup.data.transactions).toHaveLength(1);
   expect(backup.data.transactions[0]).toMatchObject({ amountCents: 8000, categoryId: "gasto-transporte" });
 

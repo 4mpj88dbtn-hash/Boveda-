@@ -6,6 +6,8 @@ import {
   ATTACHMENT_TYPES,
   budgetSchema,
   categorySchema,
+  dividendSchema,
+  purchaseSchema,
   recurringSchema,
   templateSchema,
   transactionSchema,
@@ -17,6 +19,7 @@ import {
   type Template,
   type Transaction,
 } from "@/modules/finance/types";
+import type { Dividend, Purchase } from "@/modules/investing/lib/portfolio";
 import { todayInCancun } from "./dates";
 
 /**
@@ -25,9 +28,10 @@ import { todayInCancun } from "./dates";
  *   v1 (Fase 0): ajustes.
  *   v2 (Fase 1, parte 1): ajustes, cuentas, categorías y movimientos.
  *   v3 (Fase 1, parte 2): además presupuestos, recurrentes, plantillas y fotos de tickets.
+ *   v4 (Fase 4): además compras de ETFs y dividendos.
  */
 
-export const BACKUP_VERSION = 3;
+export const BACKUP_VERSION = 4;
 
 /** Ajustes que nunca salen del celular. */
 export const PRIVATE_SETTING_KEYS = ["pin", "pinFailures"] as const;
@@ -61,6 +65,8 @@ const backupSchema = z.object({
     recurring: z.array(recurringSchema).optional(),
     templates: z.array(templateSchema).optional(),
     attachments: z.array(attachmentFileSchema).optional(),
+    purchases: z.array(purchaseSchema).optional(),
+    dividends: z.array(dividendSchema).optional(),
   }),
 });
 
@@ -73,6 +79,8 @@ export type BackupTables = {
   recurring: Recurring[];
   templates: Template[];
   attachments: Attachment[];
+  purchases: Purchase[];
+  dividends: Dividend[];
 };
 
 /** Tal como se escribe en el archivo. */
@@ -179,6 +187,8 @@ export function parseBackup(text: string): ParseBackupResult {
     recurring: data.recurring ?? [],
     templates: data.templates ?? [],
     attachments,
+    purchases: data.purchases ?? [],
+    dividends: data.dividends ?? [],
   };
   if (hasBrokenReferences(tables)) return { ok: false, error: DAMAGED };
   return { ok: true, backup: { app: "boveda", version: parsed.data.version, exportedAt: parsed.data.exportedAt, data: tables } };

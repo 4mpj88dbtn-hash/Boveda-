@@ -189,3 +189,31 @@ export const attachmentSchema = z.object({
   createdAt: z.number(),
 });
 export type Attachment = z.infer<typeof attachmentSchema>;
+
+/* ---------- Fase 4: inversión ---------- */
+
+const decimalText = (decimals: number) => z.string().regex(new RegExp(`^(?:0|[1-9]\\d{0,9})(?:\\.\\d{1,${decimals}})?$`));
+
+/** Compra de un ETF: títulos, precio y tipo de cambio como texto decimal (big.js). */
+export const purchaseSchema = z.object({
+  id,
+  date: isoDate,
+  assetId: z.string().min(1).max(40),
+  shares: decimalText(8),
+  priceUsd: decimalText(4),
+  fxRate: z.string().regex(RATE_PATTERN),
+  commissionCents: cents.min(0),
+  commissionCurrency: z.enum(CURRENCIES),
+  note: z.string().max(280),
+  createdAt: z.number(),
+});
+
+export const dividendSchema = z.object({
+  id,
+  date: isoDate,
+  assetId: z.string().min(1).max(40),
+  amountUsdCents: cents.positive(),
+  fxRate: z.string().regex(RATE_PATTERN),
+  note: z.string().max(280),
+  createdAt: z.number(),
+});

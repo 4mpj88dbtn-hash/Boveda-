@@ -27,7 +27,7 @@ describe("base de datos", () => {
 
     const db = new BovedaDatabase("prueba-migracion");
     await db.open();
-    expect(db.verno).toBe(3);
+    expect(db.verno).toBe(4);
     expect(await db.settings.toArray()).toEqual([
       { key: "displayName", value: "Ana" },
       { key: "lockPolicy", value: "siempre" },
@@ -55,10 +55,11 @@ describe("base de datos", () => {
 
     const db = new BovedaDatabase("prueba-v2");
     await db.open();
-    expect(db.verno).toBe(3);
+    expect(db.verno).toBe(4);
     expect(await db.transactions.get("t1")).toMatchObject({ amountCents: 25_000 });
     expect(await db.accounts.get("banco")).toMatchObject({ order: 3 });
     expect(await db.recurring.count()).toBe(0);
+    expect(await db.purchases.count()).toBe(0);
     db.close();
   });
 });
