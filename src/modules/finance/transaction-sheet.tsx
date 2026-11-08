@@ -1,18 +1,34 @@
 "use client";
 
-import { ChevronDown, Delete, Repeat2, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronDown, Delete, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormMessage, Input, Label, Select } from "@/components/ui/field";
 import { Sheet } from "@/components/ui/sheet";
 import { showToast } from "@/components/ui/toast";
-import { formatDate, todayInCancun } from "@/lib/dates";
+import { bytesToBase64 } from "@/lib/backup";
+import { formatDate, monthRange, todayInCancun } from "@/lib/dates";
+import { getDb } from "@/lib/db";
+import { compressImage, type CompressedImage } from "@/lib/images";
 import { convertCents, formatMoney, type Currency } from "@/lib/money";
 import { setSetting, useSetting, type Settings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
-import { deleteTransaction, putTransaction, useAccounts, useCategories, useLastTransaction } from "./data";
-import { CategoryIcon } from "./icons";
+import {
+  nextOrder,
+  putRecurring,
+  putTemplate,
+  putTransaction,
+  removeTransaction,
+  replaceAttachment,
+  useAccounts,
+  useAttachments,
+  useCategories,
+  useLastTransaction,
+  useTemplates,
+} from "./data";
+import { rootCategoryId, spendingByRootCategory, thresholdCrossed } from "./lib/budgets";
 import { centsToKeypad, formatKeypad, keypadToCents, pressKey, type KeypadKey } from "./lib/keypad";
+import { nextOccurrenceAfter } from "./lib/recurrence";
 import {
   buildTransaction,
   isValidRate,
@@ -21,15 +37,26 @@ import {
   type FxInput,
   type TransactionDraft,
 } from "./lib/transactions";
-import { closeTransactionSheet, useTransactionSheet, type SheetRequest } from "./sheet-store";
+import { runRecurring } from "./recurring-runner";
+import { closeTransactionSheet, useTransactionSheet, type MovementPreset, type SheetRequest } from "./sheet-store";
+import { CategoryPicker, Chip, PhotoField, QuickChips, TransferAccounts } from "./transaction-fields";
 import {
+  FREQUENCIES,
+  FREQUENCY_LABELS,
+  movementTemplateSchema,
   PAYMENT_METHOD_LABELS,
   PAYMENT_METHODS,
+  RECURRING_MODE_LABELS,
+  RECURRING_MODES,
   TRANSACTION_TYPE_LABELS,
   TRANSACTION_TYPES,
   type Account,
+  type Attachment,
   type Category,
+  type Frequency,
   type PaymentMethod,
+  type RecurringMode,
+  type Template,
   type Transaction,
   type TransactionType,
 } from "./types";
@@ -46,16 +73,20 @@ export function TransactionSheetHost() {
 function SheetLoader({ request }: { request: SheetRequest }) {
   const accounts = useAccounts();
   const categories = useCategories();
+  const templates = useTemplates();
   const last = useLastTransaction();
   const savedRate = useSetting("usdMxnRate");
-  if (!accounts || !categories || last === undefined || !savedRate) return null;
+  const attachments = useAttachments(request.kind === "editar" ? request.transaction.id : null);
+  if (!accounts || !categories || !templates || last === undefined || !savedRate || !attachments) return null;
   return (
     <TransactionSheet
       request={request}
       accounts={accounts}
       categories={categories}
+      templates={templates}
       last={last}
       savedRate={savedRate.value ?? null}
+      attachment={attachments[0] ?? null}
     />
   );
 }
@@ -73,46 +104,61 @@ const KEYS: { key: KeypadKey; label: string }[] = [
   { key: "borrar", label: "Borrar" },
 ];
 
+type Photo = { kind: "igual" } | { kind: "nueva"; image: CompressedImage; url: string } | { kind: "quitar" };
+
 type SheetProps = {
   request: SheetRequest;
   accounts: Account[];
   categories: Category[];
+  templates: Template[];
   last: Transaction | null;
   savedRate: Settings["usdMxnRate"] | null;
+  attachment: Attachment | null;
 };
 
-function TransactionSheet({ request, accounts, categories, last, savedRate }: SheetProps) {
+function TransactionSheet({ request, accounts, categories, templates, last, savedRate, attachment }: SheetProps) {
   const editing = request.kind === "editar" ? request.transaction : null;
+  const preset: MovementPreset = editing ?? (request.kind === "nuevo" ? (request.preset ?? {}) : {});
   const today = todayInCancun();
 
   // Cuentas que se pueden elegir: las activas y las que ya usa el movimiento.
   const usable = accounts.filter(
-    (account) => !account.archived || account.id === editing?.accountId || account.id === editing?.toAccountId,
+    (account) => !account.archived || account.id === preset.accountId || account.id === preset.toAccountId,
   );
   const lastAccount = last && usable.some((account) => account.id === last.accountId) ? last.accountId : undefined;
   const initialAccount =
-    editing?.accountId ?? (request.kind === "nuevo" ? request.accountId : undefined) ?? lastAccount ?? usable[0]?.id ?? null;
+    preset.accountId ?? (request.kind === "nuevo" ? request.accountId : undefined) ?? lastAccount ?? usable[0]?.id ?? null;
 
   const otherAccount = (id: string | null) => usable.find((account) => account.id !== id)?.id ?? null;
   const currencyOf = (id: string | null): Currency => usable.find((account) => account.id === id)?.currency ?? "MXN";
+  const categoryName = (id: string | null) => categories.find((category) => category.id === id)?.name;
 
   const [type, setType] = useState<TransactionType>(
-    editing?.type ?? (request.kind === "nuevo" ? request.type : undefined) ?? "gasto",
+    preset.type ?? (request.kind === "nuevo" ? request.type : undefined) ?? "gasto",
   );
-  const [keypad, setKeypad] = useState(editing ? centsToKeypad(editing.amountCents) : "");
-  const [currency, setCurrency] = useState<Currency>(editing?.currency ?? currencyOf(initialAccount));
-  const [categoryId, setCategoryId] = useState<string | null>(editing?.categoryId ?? null);
+  const [keypad, setKeypad] = useState(preset.amountCents ? centsToKeypad(preset.amountCents) : "");
+  const [currency, setCurrency] = useState<Currency>(preset.currency ?? currencyOf(initialAccount));
+  const [categoryId, setCategoryId] = useState<string | null>(preset.categoryId ?? null);
   const [accountId, setAccountId] = useState<string | null>(initialAccount);
-  const [toAccountId, setToAccountId] = useState<string | null>(editing?.toAccountId ?? otherAccount(initialAccount));
-  const [date, setDate] = useState(editing?.date ?? today);
-  const [note, setNote] = useState(editing?.note ?? "");
-  const [tags, setTags] = useState(editing?.tags.join(", ") ?? "");
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(editing?.paymentMethod ?? null);
-  const [rate, setRate] = useState(editing?.fxRate ?? savedRate?.rate ?? "");
+  const [toAccountId, setToAccountId] = useState<string | null>(preset.toAccountId ?? otherAccount(initialAccount));
+  const [date, setDate] = useState(preset.date ?? today);
+  const [note, setNote] = useState(preset.note ?? "");
+  const [tags, setTags] = useState(preset.tags?.join(", ") ?? "");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(preset.paymentMethod ?? null);
+  const [rate, setRate] = useState(editing?.fxRate ?? savedRate?.rate ?? preset.fxRate ?? "");
+  const [repeat, setRepeat] = useState<Frequency | null>(request.kind === "nuevo" ? (request.repeat ?? null) : null);
+  const [repeatMode, setRepeatMode] = useState<RecurringMode>("automatico");
+  const [asTemplate, setAsTemplate] = useState(request.kind === "nuevo" && Boolean(request.asTemplate));
+  const [templateName, setTemplateName] = useState("");
+  const [photo, setPhoto] = useState<Photo>({ kind: "igual" });
+  const [photoBusy, setPhotoBusy] = useState(false);
   const [showDetails, setShowDetails] = useState(
-    Boolean(editing && (editing.note || editing.tags.length > 0 || editing.paymentMethod)),
+    Boolean(
+      (request.kind === "nuevo" && (request.repeat || request.asTemplate)) ||
+        (editing && (editing.note || editing.tags.length > 0 || editing.paymentMethod || attachment)),
+    ),
   );
-  const [error, setError] = useState<{ field: DraftField; message: string } | null>(null);
+  const [error, setError] = useState<{ field: DraftField | "plantilla"; message: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [closing, setClosing] = useState(false);
 
@@ -121,11 +167,15 @@ function TransactionSheet({ request, accounts, categories, last, savedRate }: Sh
   const involved = isTransfer ? [currencyOf(accountId), currencyOf(toAccountId)] : [currencyOf(accountId)];
   const fxNeeded = needsFxRate(currency, involved);
   const pristine = keypad === "" && categoryId === null;
+  const canRepeat = request.kind === "nuevo" && !request.recurring;
 
-  const visibleCategories = categories.filter(
-    (category) =>
-      category.type === type && category.parentId === null && (!category.archived || category.id === categoryId),
+  // Vista previa de la foto guardada (como data URL: no hay que liberar nada).
+  const existingUrl = useMemo(
+    () => (attachment ? `data:${attachment.mimeType};base64,${bytesToBase64(attachment.data)}` : null),
+    [attachment],
   );
+
+  const previewUrl = photo.kind === "nueva" ? photo.url : photo.kind === "quitar" ? null : existingUrl;
 
   function press(key: KeypadKey) {
     setKeypad((value) => pressKey(value, key));
@@ -146,18 +196,19 @@ function TransactionSheet({ request, accounts, categories, last, savedRate }: Sh
     setError(null);
   }
 
-  function repeatLast() {
-    if (!last) return;
-    setType(last.type);
-    setKeypad(centsToKeypad(last.amountCents));
-    setCurrency(last.currency);
-    setCategoryId(last.categoryId);
-    if (usable.some((account) => account.id === last.accountId)) setAccountId(last.accountId);
-    if (last.toAccountId && usable.some((account) => account.id === last.toAccountId)) setToAccountId(last.toAccountId);
-    setPaymentMethod(last.paymentMethod);
-    setNote(last.note);
-    setTags(last.tags.join(", "));
-    if (last.fxRate && !savedRate) setRate(last.fxRate);
+  /** Llena la hoja con un movimiento o una plantilla; la fecha sigue siendo hoy. */
+  function fill(values: MovementPreset) {
+    if (values.type) setType(values.type);
+    if (values.amountCents) setKeypad(centsToKeypad(values.amountCents));
+    if (values.currency) setCurrency(values.currency);
+    if (values.categoryId !== undefined) setCategoryId(values.categoryId);
+    if (values.accountId && usable.some((account) => account.id === values.accountId)) setAccountId(values.accountId);
+    if (values.toAccountId && usable.some((account) => account.id === values.toAccountId)) setToAccountId(values.toAccountId);
+    if (values.paymentMethod !== undefined) setPaymentMethod(values.paymentMethod);
+    if (values.note !== undefined) setNote(values.note);
+    if (values.tags) setTags(values.tags.join(", "));
+    if (values.fxRate && !savedRate) setRate(values.fxRate);
+    setError(null);
   }
 
   /** De dónde viene el tipo de cambio escrito, para guardarlo con su fecha y su fuente. */
@@ -167,6 +218,18 @@ function TransactionSheet({ request, accounts, categories, last, savedRate }: Sh
     if (editing?.fxRate === value && editing.fxDate) return { rate: value, date: editing.fxDate, source: editing.fxSource ?? "manual" };
     if (savedRate?.rate === value) return savedRate;
     return { rate: value, date: today, source: "manual" };
+  }
+
+  async function pickPhoto(file: File) {
+    setPhotoBusy(true);
+    try {
+      const image = await compressImage(file);
+      setPhoto({ kind: "nueva", image, url: `data:${image.mimeType};base64,${bytesToBase64(image.data)}` });
+    } catch {
+      setError({ field: "nota", message: "No se pudo leer la foto. Intenta con otra." });
+    } finally {
+      setPhotoBusy(false);
+    }
   }
 
   async function save() {
@@ -197,27 +260,111 @@ function TransactionSheet({ request, accounts, categories, last, savedRate }: Sh
       return;
     }
     const saved = result.transaction;
+    const name = templateName.trim() || categoryName(saved.categoryId) || saved.note || TRANSACTION_TYPE_LABELS[saved.type];
+
     setSaving(true);
+    const undo: (() => Promise<unknown>)[] = [];
+    let budgetNote = "";
     try {
+      const budgetBefore = await budgetSnapshot(saved, categories);
       await putTransaction(saved);
+      if (editing) undo.push(() => putTransaction(editing));
+      else
+        undo.push(async () => {
+          await removeTransaction(saved);
+        });
+
+      if (photo.kind !== "igual") {
+        const next =
+          photo.kind === "nueva"
+            ? { id: crypto.randomUUID(), transactionId: saved.id, ...photo.image, createdAt: Date.now() }
+            : null;
+        await replaceAttachment(saved.id, next);
+        const previous = attachment;
+        undo.push(() => replaceAttachment(saved.id, previous));
+      }
+
+      if (canRepeat && repeat) {
+        const ruleBase = { frequency: repeat, startDate: saved.date };
+        // El esquema deja solo lo que se repite (sin id ni fechas).
+        const template = movementTemplateSchema.parse(saved);
+        const rule = {
+          ...ruleBase,
+          id: crypto.randomUUID(),
+          nextDate: nextOccurrenceAfter(ruleBase, saved.date),
+          mode: fxNeeded ? ("confirmar" as const) : repeatMode,
+          active: true,
+          template,
+          createdAt: Date.now(),
+        };
+        await putRecurring(rule);
+        undo.push(() => getDb().recurring.delete(rule.id));
+        // Si la fecha ya pasó, registra lo que falte hasta hoy.
+        await runRecurring();
+      }
+
+      if (request.kind === "nuevo" && request.recurring) {
+        const { id, date: due } = request.recurring;
+        const rule = await getDb().recurring.get(id);
+        if (rule && rule.nextDate === due) {
+          await getDb().recurring.update(id, { nextDate: nextOccurrenceAfter(rule, due) });
+          undo.push(() => getDb().recurring.update(id, { nextDate: due }));
+        }
+      }
+
+      if (asTemplate) {
+        const template: Template = {
+          id: crypto.randomUUID(),
+          name: name.slice(0, 30),
+          type: saved.type,
+          amountCents: saved.amountCents,
+          currency: saved.currency,
+          categoryId: saved.categoryId,
+          accountId: saved.accountId,
+          toAccountId: saved.toAccountId,
+          paymentMethod: saved.paymentMethod,
+          note: saved.note,
+          tags: saved.tags,
+          order: nextOrder(templates),
+          createdAt: Date.now(),
+        };
+        await putTemplate(template);
+      }
+
       // Un tipo de cambio nuevo queda como el de referencia para lo que sigue.
       if (!editing && saved.fxRate && saved.fxSource === "manual" && saved.fxDate && saved.fxRate !== savedRate?.rate) {
         await setSetting("usdMxnRate", { rate: saved.fxRate, date: saved.fxDate, source: "manual" });
+      }
+
+      if (budgetBefore) {
+        const after = await budgetSnapshot(saved, categories);
+        const crossed = after ? thresholdCrossed(budgetBefore.spent, after.spent, budgetBefore.limit) : null;
+        if (crossed && after) {
+          const percent = Math.floor((after.spent / after.limit) * 100);
+          budgetNote =
+            crossed === 100
+              ? ` Te pasaste del presupuesto de ${after.name} (${percent}%).`
+              : ` Llevas el ${percent}% del presupuesto de ${after.name}.`;
+        }
       }
     } catch {
       setSaving(false);
       setError({ field: "monto", message: "No se pudo guardar. Vuelve a intentar." });
       return;
     }
+
     closeTransactionSheet();
+    const runUndo = async () => {
+      for (const step of undo.reverse()) await step();
+    };
     if (editing) {
-      showToast({ message: "Cambios guardados", action: { label: "Deshacer", run: () => putTransaction(editing) } });
+      showToast({ message: `Cambios guardados.${budgetNote}`, action: { label: "Deshacer", run: runUndo } });
     } else {
-      const category = categories.find((item) => item.id === saved.categoryId);
+      const category = categoryName(saved.categoryId);
       const amount = formatMoney(saved.amountCents, saved.currency);
       showToast({
-        message: `${SAVED_LABEL[saved.type]}: ${amount}${category ? ` · ${category.name}` : ""}`,
-        action: { label: "Deshacer", run: () => deleteTransaction(saved.id) },
+        message: `${SAVED_LABEL[saved.type]}: ${amount}${category ? ` · ${category}` : ""}${budgetNote}`,
+        action: { label: "Deshacer", run: runUndo },
       });
     }
   }
@@ -225,15 +372,16 @@ function TransactionSheet({ request, accounts, categories, last, savedRate }: Sh
   async function remove() {
     if (!editing) return;
     setClosing(true);
+    let restore: () => Promise<void>;
     try {
-      await deleteTransaction(editing.id);
+      restore = await removeTransaction(editing);
     } catch {
       setClosing(false);
       setError({ field: "monto", message: "No se pudo eliminar. Vuelve a intentar." });
       return;
     }
     closeTransactionSheet();
-    showToast({ message: "Movimiento eliminado", action: { label: "Deshacer", run: () => putTransaction(editing) } });
+    showToast({ message: "Movimiento eliminado", action: { label: "Deshacer", run: restore } });
   }
 
   // Teclado físico: números, punto, borrar y Enter para guardar.
@@ -267,10 +415,11 @@ function TransactionSheet({ request, accounts, categories, last, savedRate }: Sh
         : "Cuántos pesos vale 1 dólar. Se guarda con la fecha de hoy.";
 
   const saveLabel = editing ? "Guardar cambios" : `Guardar ${TRANSACTION_TYPE_LABELS[type].toLowerCase()}`;
+  const title = editing ? "Editar movimiento" : request.kind === "nuevo" && request.recurring ? "Confirmar recurrente" : "Registrar";
 
   return (
     <Sheet
-      title={editing ? "Editar movimiento" : "Registrar"}
+      title={title}
       onClose={closeTransactionSheet}
       actions={
         editing ? (
@@ -291,7 +440,7 @@ function TransactionSheet({ request, accounts, categories, last, savedRate }: Sh
                 onClick={() => press(key)}
                 className="cifras grid h-11 place-items-center rounded-control bg-superficie text-titulo font-medium transition-colors duration-120 ease-boveda hover:bg-borde active:bg-borde"
               >
-                {key === "borrar" ? <Delete aria-hidden className="size-6" strokeWidth={1.75} /> : key === "." ? "." : key}
+                {key === "borrar" ? <Delete aria-hidden className="size-6" strokeWidth={1.75} /> : key}
               </button>
             ))}
           </div>
@@ -319,17 +468,16 @@ function TransactionSheet({ request, accounts, categories, last, savedRate }: Sh
           ))}
         </div>
 
-        {!editing && last && pristine ? (
-          <button
-            type="button"
-            onClick={repeatLast}
-            className="flex min-h-11 items-center gap-2 self-start rounded-full border border-borde-control px-3 text-etiqueta text-texto-2 transition-colors duration-120 ease-boveda hover:text-texto"
-          >
-            <Repeat2 aria-hidden className="size-4" />
-            Repetir último:{" "}
-            <span className="cifras text-texto">{formatMoney(last.amountCents, last.currency)}</span>
-            {categories.find((category) => category.id === last.categoryId)?.name ?? TRANSACTION_TYPE_LABELS[last.type]}
-          </button>
+        {request.kind === "nuevo" && !request.recurring && pristine ? (
+          <QuickChips
+            last={last}
+            templates={templates}
+            categoryName={categoryName}
+            onRepeat={() => last && fill(last)}
+            onTemplate={(template) =>
+              fill({ ...template, amountCents: template.amountCents ?? undefined, accountId: template.accountId ?? undefined })
+            }
+          />
         ) : null}
 
         <div className="flex items-end justify-between gap-3">
@@ -407,29 +555,16 @@ function TransactionSheet({ request, accounts, categories, last, savedRate }: Sh
             }}
           />
         ) : (
-          <div role="group" aria-label="Categoría" className="grid grid-cols-4 gap-1.5">
-            {visibleCategories.map((category) => (
-              <button
-                key={category.id}
-                type="button"
-                aria-pressed={categoryId === category.id}
-                onClick={() => {
-                  setCategoryId(category.id);
-                  setError(null);
-                }}
-                className={cn(
-                  "flex min-h-14 flex-col items-center justify-center gap-1 rounded-control border px-1 py-1.5 text-center text-nota leading-tight transition-colors duration-120 ease-boveda",
-                  categoryId === category.id
-                    ? "border-laton bg-superficie text-texto"
-                    : "border-borde text-texto-2 hover:text-texto",
-                  error?.field === "categoria" && categoryId === null && "border-negativo",
-                )}
-              >
-                <CategoryIcon name={category.icon} className={categoryId === category.id ? "text-laton" : undefined} />
-                <span className="line-clamp-2 break-words">{category.name}</span>
-              </button>
-            ))}
-          </div>
+          <CategoryPicker
+            categories={categories}
+            type={type === "ingreso" ? "ingreso" : "gasto"}
+            value={categoryId}
+            invalid={error?.field === "categoria"}
+            onChange={(id) => {
+              setCategoryId(id);
+              setError(null);
+            }}
+          />
         )}
 
         <div className="flex flex-wrap items-center gap-2">
@@ -470,7 +605,7 @@ function TransactionSheet({ request, accounts, categories, last, savedRate }: Sh
         </div>
 
         {showDetails ? (
-          <div id="mas-detalles" className="flex flex-col gap-4">
+          <div id="mas-detalles" className="flex flex-col gap-4 pt-1">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="nota">Nota</Label>
               <Input
@@ -489,18 +624,13 @@ function TransactionSheet({ request, accounts, categories, last, savedRate }: Sh
                 </span>
                 <div role="group" aria-labelledby="metodo-titulo" className="flex flex-wrap gap-2">
                   {PAYMENT_METHODS.map((method) => (
-                    <button
+                    <Chip
                       key={method}
-                      type="button"
-                      aria-pressed={paymentMethod === method}
+                      pressed={paymentMethod === method}
                       onClick={() => setPaymentMethod((value) => (value === method ? null : method))}
-                      className={cn(
-                        "h-11 rounded-full border px-3 text-etiqueta transition-colors duration-120 ease-boveda",
-                        paymentMethod === method ? "border-laton text-texto" : "border-borde-control text-texto-2",
-                      )}
                     >
                       {PAYMENT_METHOD_LABELS[method]}
-                    </button>
+                    </Chip>
                   ))}
                 </div>
               </div>
@@ -519,6 +649,72 @@ function TransactionSheet({ request, accounts, categories, last, savedRate }: Sh
                 Sepáralas con comas.
               </p>
             </div>
+
+            {canRepeat ? (
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="repetir">Repetir</Label>
+                <Select
+                  id="repetir"
+                  value={repeat ?? ""}
+                  onChange={(event) => setRepeat((event.target.value || null) as Frequency | null)}
+                >
+                  <option value="">No se repite</option>
+                  {FREQUENCIES.map((frequency) => (
+                    <option key={frequency} value={frequency}>
+                      {FREQUENCY_LABELS[frequency]}
+                    </option>
+                  ))}
+                </Select>
+                {repeat ? (
+                  fxNeeded ? (
+                    <p className="text-nota text-texto-2">
+                      Con dólares siempre te pedirá confirmación, para que revises el tipo de cambio.
+                    </p>
+                  ) : (
+                    <Select
+                      aria-label="Cómo registrarlo"
+                      value={repeatMode}
+                      onChange={(event) => setRepeatMode(event.target.value as RecurringMode)}
+                    >
+                      {RECURRING_MODES.map((mode) => (
+                        <option key={mode} value={mode}>
+                          {RECURRING_MODE_LABELS[mode]}
+                        </option>
+                      ))}
+                    </Select>
+                  )
+                ) : null}
+              </div>
+            ) : null}
+
+            <div className="flex flex-col gap-2">
+              <label className="flex min-h-11 items-center gap-3 text-interfaz">
+                <input
+                  type="checkbox"
+                  checked={asTemplate}
+                  onChange={(event) => setAsTemplate(event.target.checked)}
+                  className="size-5 accent-laton"
+                />
+                Guardar también como plantilla
+              </label>
+              {asTemplate ? (
+                <Input
+                  aria-label="Nombre de la plantilla"
+                  value={templateName}
+                  maxLength={30}
+                  autoComplete="off"
+                  placeholder={`Ej. ${categoryName(categoryId) ?? "Café"}`}
+                  onChange={(event) => setTemplateName(event.target.value)}
+                />
+              ) : null}
+            </div>
+
+            <PhotoField
+              previewUrl={previewUrl}
+              busy={photoBusy}
+              onPick={(file) => void pickPhoto(file)}
+              onRemove={() => setPhoto({ kind: "quitar" })}
+            />
           </div>
         ) : null}
       </div>
@@ -526,50 +722,19 @@ function TransactionSheet({ request, accounts, categories, last, savedRate }: Sh
   );
 }
 
-function TransferAccounts({
-  accounts,
-  from,
-  to,
-  onFrom,
-  onTo,
-}: {
-  accounts: Account[];
-  from: string | null;
-  to: string | null;
-  onFrom: (id: string) => void;
-  onTo: (id: string) => void;
-}) {
-  if (accounts.length < 2) {
-    return (
-      <p className="text-interfaz text-texto-2">
-        Para transferir necesitas dos cuentas. Agrega otra en Finanzas → Cuentas.
-      </p>
-    );
-  }
-  return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="cuenta-origen">Sale de</Label>
-        <Select id="cuenta-origen" value={from ?? ""} onChange={(event) => onFrom(event.target.value)}>
-          {accounts.map((account) => (
-            <option key={account.id} value={account.id}>
-              {account.name} · {account.currency}
-            </option>
-          ))}
-        </Select>
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="cuenta-destino">Entra a</Label>
-        <Select id="cuenta-destino" value={to ?? ""} onChange={(event) => onTo(event.target.value)}>
-          {accounts
-            .filter((account) => account.id !== from)
-            .map((account) => (
-              <option key={account.id} value={account.id}>
-                {account.name} · {account.currency}
-              </option>
-            ))}
-        </Select>
-      </div>
-    </div>
-  );
+/** Gasto del mes en la categoría madre del movimiento, si tiene presupuesto. */
+async function budgetSnapshot(
+  transaction: Transaction,
+  categories: Category[],
+): Promise<{ spent: number; limit: number; name: string } | null> {
+  if (transaction.type !== "gasto" || transaction.categoryId === null) return null;
+  const byId = new Map(categories.map((category) => [category.id, category]));
+  const root = rootCategoryId(transaction.categoryId, byId);
+  const db = getDb();
+  const budget = await db.budgets.get(root);
+  if (!budget) return null;
+  const range = monthRange(transaction.date);
+  const month = await db.transactions.where("date").between(range.start, range.end, true, true).toArray();
+  const spent = spendingByRootCategory(month, categories, range).get(root) ?? 0;
+  return { spent, limit: budget.amountCents, name: byId.get(root)?.name ?? "la categoría" };
 }

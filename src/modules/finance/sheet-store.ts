@@ -1,12 +1,42 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import type { Transaction, TransactionType } from "./types";
+import type { IsoDate } from "@/lib/dates";
+import type { Frequency, Transaction, TransactionType } from "./types";
 
-/** Abre la hoja de movimiento desde cualquier pantalla (botón +, historial, cuentas). */
+/** Abre la hoja de movimiento desde cualquier pantalla (botón +, historial, cuentas, recurrentes). */
+
+/** Valores con los que se llena la hoja (de una plantilla o de un recurrente). */
+export type MovementPreset = Partial<
+  Pick<
+    Transaction,
+    | "type"
+    | "amountCents"
+    | "currency"
+    | "fxRate"
+    | "categoryId"
+    | "accountId"
+    | "toAccountId"
+    | "paymentMethod"
+    | "note"
+    | "tags"
+    | "date"
+  >
+>;
 
 export type SheetRequest =
-  | { kind: "nuevo"; type?: TransactionType; accountId?: string }
+  | {
+      kind: "nuevo";
+      type?: TransactionType;
+      accountId?: string;
+      preset?: MovementPreset;
+      /** Confirmación de un recurrente: al guardar, la regla pasa a su siguiente fecha. */
+      recurring?: { id: string; date: IsoDate };
+      /** Abre con "Repetir" ya elegido. */
+      repeat?: Frequency;
+      /** Abre con "Guardar también como plantilla" marcado. */
+      asTemplate?: boolean;
+    }
   | { kind: "editar"; transaction: Transaction };
 
 type OpenSheet = SheetRequest & { key: number };

@@ -1,6 +1,6 @@
 # Hoja de ruta — Bóveda
 
-Regla: no se empieza una fase sin que la anterior esté probada y aprobada por el usuario.
+Regla: no se empieza una fase sin que la anterior esté probada y aprobada por el usuario. El 05/11/2026 pediste seguir con todas las fases sin esperar; cada avance se publica para que lo pruebes cuando quieras.
 Al cerrar cada fase se informa: qué se hizo, cómo probarlo paso a paso, qué falta y qué se propone mejorar.
 Cada avance se publica en https://4mpj88dbtn-hash.github.io/Boveda-/ para verlo en el celular.
 
@@ -9,7 +9,7 @@ Estado: ⬜ pendiente · 🟨 en curso · ✅ aprobada
 | Fase | Contenido | Entregable | Estado |
 |---|---|---|---|
 | 0 — Base | Diseño, componentes base, PIN, datos en el dispositivo, respaldos, sin conexión, publicación | App vacía con el diseño, el PIN y la instalación funcionando | ✅ |
-| 1 — Finanzas | Registro rápido, categorías, cuentas, historial, resúmenes semanal y mensual, presupuestos | Ya puedo usarla a diario | 🟨 |
+| 1 — Finanzas | Registro rápido, categorías, cuentas, historial, resúmenes semanal y mensual, presupuestos | Ya puedo usarla a diario | ✅ |
 | 2 — Mercados | Watchlist, gráficas, comparador base 100, estado del mercado | Veo todos mis activos clave | ⬜ |
 | 3 — Noticias y señales | Feed, calendario económico, avisos de mercado por Telegram, alertas en la app | Me llegan avisos de mercado al celular | ⬜ |
 | 4 — Inversión S&P 500 | Portafolio, calculadoras, guía educativa, fundamentales | Controlo y entiendo mi inversión | ⬜ |
@@ -44,7 +44,7 @@ Las secciones citadas (§) se refieren a [`docs/REQUISITOS.md`](docs/REQUISITOS.
 
 **Cómo se aprueba:** abres la dirección en tu celular, configuras tu PIN, instalas la app y ves el Centro de mando con el diseño. Luego la abres sin internet y sigue funcionando.
 
-## Fase 1 — Finanzas 🟨
+## Fase 1 — Finanzas ✅
 
 **Entregable:** ya puedo usarla a diario. Se entrega en dos partes.
 
@@ -60,18 +60,21 @@ Las secciones citadas (§) se refieren a [`docs/REQUISITOS.md`](docs/REQUISITOS.
 - [x] Centro de mando con tu patrimonio neto y los totales del mes
 - [x] Base de datos versión 2 con migración probada desde la Fase 0; respaldo versión 2 con todas las tablas que sigue leyendo los de la Fase 0
 - [x] Pruebas: saldos, patrimonio, conversión de moneda, totales del mes y de la semana, tasa de ahorro, variación %, validación de movimientos, teclado, migración y respaldo; flujo completo de registrar, deshacer, dólares, editar, cuentas y restaurar
-- [ ] Tu prueba y aprobación de la parte 1
+- [x] Pediste continuar con todas las fases (05/11/2026)
 
-### Parte 2
+### Parte 2 — lista (08/11/2026)
 
-- Resúmenes semanal (desde el domingo 20:00) y mensual (desde el día 1, 9:00) en la pantalla "Resúmenes", con exportación a PDF
-- Presupuestos mensuales por categoría con alertas al 80% y 100%; plantilla 50/30/20 editable
-- Movimientos recurrentes y plantillas
-- Subcategorías en el registro (la base ya las admite)
-- Foto del ticket
-- Gráfica mensual del patrimonio neto
-- Recordatorio para descargar el respaldo cada semana
-- Evaluar cifrar los movimientos con una llave derivada del PIN *(propuesta)*
+- [x] Resúmenes semanal (domingo 20:00) y mensual (día 1, 9:00) en la pantalla "Resúmenes": totales, comparación contra el periodo anterior y el promedio de 4, top 5 de categorías, gasto diario promedio, día de mayor gasto; el mensual agrega presupuestos, cambio de patrimonio y el mismo mes del año anterior
+- [x] Exportar el resumen a PDF (hecho en el dispositivo) y compartirlo como texto por Telegram, WhatsApp o correo
+- [x] Presupuestos mensuales por categoría con barra y avisos al 80% y 100% (al registrar y en el Centro de mando); plantilla 50/30/20 editable con tu ingreso promedio
+- [x] Movimientos recurrentes (semana, 2 semanas, quincena, mes, año) que se registran solos o piden confirmación; los de dólares siempre piden confirmación
+- [x] Plantillas de gastos frecuentes a un toque
+- [x] Subcategorías (un nivel) que cuentan dentro de su categoría
+- [x] Foto del ticket, comprimida en el dispositivo e incluida en el respaldo
+- [x] Gráfica mensual del patrimonio neto
+- [x] Recordatorio semanal para descargar el respaldo
+- [x] Cifrado con llave del PIN: evaluado y descartado por ahora (razones en `docs/ARQUITECTURA.md` §9)
+- [x] Base de datos versión 3 y respaldo versión 3, con pruebas de migración
 
 ## Fase 2 — Mercados ⬜
 

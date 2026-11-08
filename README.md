@@ -4,9 +4,11 @@ App personal de finanzas, inversión y mercados, instalable en celular y computa
 
 > Información educativa. No es asesoría financiera.
 
-**Dirección:** https://4mpj88dbtn-hash.github.io/Boveda-/
+## 👉 Abrir la app: https://4mpj88dbtn-hash.github.io/Boveda-/
 
-**Estado:** Fase 1, parte 1 lista para probar: registrar gastos e ingresos, cuentas, transferencias, historial y el Centro de mando con tus números. Las demás secciones muestran qué llega en cada fase. El avance está en [`ROADMAP.md`](ROADMAP.md).
+Para tenerla siempre a la mano, instálala: en iPhone, Safari → Compartir → **Agregar a inicio**; en Android, Chrome → ⋮ → **Instalar app**.
+
+**Estado:** Fase 1 (Finanzas) completa: registro rápido, cuentas, historial, resúmenes con PDF, presupuestos, recurrentes, plantillas y foto del ticket. Las demás secciones muestran qué llega en cada fase. El avance está en [`ROADMAP.md`](ROADMAP.md).
 
 ## Activar la publicación (una sola vez)
 

@@ -97,7 +97,7 @@ La ruta base es `/Boveda-` (el nombre del repositorio). Los enlaces de Next la a
 - Política de seguridad de contenido en cada página: la app solo carga y se conecta a sus propios archivos (`src/app/layout.tsx`).
 - El repositorio es público: nunca se suben claves ni datos. Las claves de las Fases 2–3 vivirán en los secretos de GitHub Actions.
 - Las APIs de mercado nunca reciben datos tuyos: las consulta GitHub Actions, no tu dispositivo.
-- Los datos en IndexedDB no están cifrados en la Fase 0. Se evaluará cifrarlos con una llave derivada del PIN cuando haya movimientos (Fase 1).
+- Los datos en IndexedDB no están cifrados. **Evaluación del 08/11/2026: no se cifran por ahora.** Razones: (1) solo protegería contra alguien que ya tiene tu celular desbloqueado y sabe abrir las herramientas del navegador; (2) si olvidas el PIN perderías también tus respaldos cifrados, y hoy la salida es borrar todo y restaurar; (3) cambiar el PIN obligaría a recifrar todo, con riesgo de perder datos a medio camino. Lo que sí protege: el PIN para abrir la app, que no se dibuje nada mientras está bloqueada y el bloqueo de pantalla de tu celular. Se puede revisar en la Fase 6 junto con el desbloqueo con Face ID.
 
 ## 10. Fuentes consultadas (05/11/2026)
 

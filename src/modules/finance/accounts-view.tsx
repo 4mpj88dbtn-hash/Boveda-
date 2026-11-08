@@ -15,6 +15,7 @@ import { setSetting, useSetting } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 import { nextOrder, putAccount, useAccounts, useTransactions } from "./data";
 import { AccountIcon } from "./icons";
+import { NetWorthChart } from "./net-worth-chart";
 import { accountBalances, netWorth } from "./lib/balances";
 import { centsToKeypad } from "./lib/keypad";
 import { isValidRate } from "./lib/transactions";
@@ -70,6 +71,8 @@ export function AccountsView() {
           </p>
         ) : null}
       </Panel>
+
+      <NetWorthChart accounts={accounts} transactions={transactions} usdRate={usdRate.value?.rate ?? null} />
 
       <div className="flex flex-wrap gap-2">
         <Button onClick={() => setEditing({ kind: "nueva" })}>

@@ -2,6 +2,7 @@ import { BottomNav } from "@/components/layout/bottom-nav";
 import { MobileTopBar } from "@/components/layout/mobile-top-bar";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Toaster } from "@/components/ui/toast";
+import { RecurringRunner } from "@/modules/finance/recurring-runner";
 import { TransactionSheetHost } from "@/modules/finance/transaction-sheet";
 import { LockGate } from "@/modules/lock/lock-gate";
 
@@ -23,6 +24,7 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
         <BottomNav />
       </div>
       <TransactionSheetHost />
+      <RecurringRunner />
       <Toaster />
     </LockGate>
   );

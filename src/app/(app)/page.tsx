@@ -3,6 +3,7 @@ import { EducationalNotice, EmptyState, PhaseTag } from "@/components/ui/notices
 import { Panel } from "@/components/ui/panel";
 import { Greeting } from "@/modules/command-center/greeting";
 import { MonthPanel, NetWorthHeader } from "@/modules/finance/overview";
+import { TodayPanel } from "@/modules/finance/today-panel";
 
 export const metadata: Metadata = { title: "Centro de mando" };
 
@@ -12,6 +13,8 @@ export default function CommandCenterPage() {
       <Greeting />
 
       <NetWorthHeader />
+
+      <TodayPanel />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
         <MonthPanel />
