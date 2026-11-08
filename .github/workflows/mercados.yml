@@ -1,11 +1,12 @@
-# Baja precios de mercado y los publica en GitHub Pages junto a la app (carpeta datos/).
+# Baja precios, noticias y calendario, manda avisos por Telegram y publica todo en GitHub Pages
+# junto a la app (carpeta datos/).
 # Los horarios programados solo corren desde la rama principal (main).
 name: Datos de mercado
 
 on:
   schedule:
     # Cada 20 minutos en horario de mercado de EE. UU. (en UTC), de lunes a viernes.
-    - cron: "*/20 13-21 * * 1-5"
+    - cron: "*/20 12-21 * * 1-5"
     # Cada 3 horas el resto del tiempo (cripto opera todos los días).
     - cron: "40 */3 * * *"
   workflow_dispatch:
@@ -13,6 +14,7 @@ on:
     branches: [main, "fase-*"]
     paths:
       - "scripts/mercados/**"
+      - "scripts/senales/**"
       - "scripts/publicar-gh-pages.sh"
       - "src/modules/markets/catalogo.json"
       - ".github/workflows/mercados.yml"
@@ -34,6 +36,9 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 22
+          cache: npm
+      - name: Instalar dependencias (zona horaria de Nueva York)
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Traer los datos ya publicados
         run: |
           mkdir -p datos-publicados
@@ -45,6 +50,15 @@ jobs:
           BANXICO_TOKEN: ${{ secrets.BANXICO_TOKEN }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: node scripts/mercados/actualizar.mjs datos-publicados
+      - name: Noticias, calendario y avisos
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SENALES_CONFIG: ${{ vars.SENALES_CONFIG }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+        run: node --experimental-strip-types --no-warnings scripts/senales/actualizar.mjs datos-publicados
       - name: Publicar los datos
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
