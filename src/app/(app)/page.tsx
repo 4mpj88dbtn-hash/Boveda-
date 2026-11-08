@@ -4,6 +4,7 @@ import { Panel } from "@/components/ui/panel";
 import { Greeting } from "@/modules/command-center/greeting";
 import { MonthPanel, NetWorthHeader } from "@/modules/finance/overview";
 import { TodayPanel } from "@/modules/finance/today-panel";
+import { MarketsTicker } from "@/modules/markets/markets-ticker";
 
 export const metadata: Metadata = { title: "Centro de mando" };
 
@@ -34,12 +35,7 @@ export default function CommandCenterPage() {
         </Panel>
       </div>
 
-      <Panel title="Mercados" action={<PhaseTag phase={2} />}>
-        <EmptyState
-          title="La cinta de mercados llega en la Fase 2"
-          description="S&P 500, Nasdaq, IPC, Bitcoin y dólar vs peso, cada dato con su fuente y su hora de actualización."
-        />
-      </Panel>
+      <MarketsTicker />
 
       <div className="grid gap-4 md:grid-cols-2 lg:gap-6">
         <Panel title="Señales recientes" action={<PhaseTag phase={3} />}>

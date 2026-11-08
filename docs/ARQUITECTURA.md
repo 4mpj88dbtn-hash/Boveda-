@@ -82,7 +82,7 @@ La ruta base es `/Boveda-` (el nombre del repositorio). Los enlaces de Next la a
 |---|---|
 | Registro, cuentas, presupuestos, historial (Fase 1) | Igual, todo en el dispositivo y sin conexión |
 | Resúmenes semanal y mensual (Fase 1) | Se calculan en la app y aparecen desde la hora indicada (domingo 20:00, día 1 a las 9:00). No llegan solos por Telegram |
-| Precios y gráficas (Fase 2) | Una tarea programada de GitHub Actions baja los precios y los publica como JSON; tendrán algunos minutos de retraso, siempre indicado. Cripto puede ir en vivo con un WebSocket público sin clave |
+| Precios y gráficas (Fase 2) | Hecho: `scripts/mercados/actualizar.mjs` corre en GitHub Actions (cada 20 min en horario de mercado, cada 3 h fuera) y escribe `datos/mercados.json` (precios), `datos/intradia/<id>.json` (1D y 5D) y `datos/series/<id>.json` (diaria 5 años y semanal desde el inicio, una vez al día). `scripts/publicar-gh-pages.sh` publica la app y los datos sin pisarse (un solo commit en `gh-pages`, reintento con `--force-with-lease`). La app los lee con Zod y el service worker guarda la última copia para usarla sin internet |
 | Noticias y calendario (Fase 3) | Igual que los precios: los arma GitHub Actions |
 | Avisos por Telegram (Fase 3) | Los de mercado (pre-apertura, cierre, movimientos fuertes) sí, desde GitHub Actions. Los que usan tus datos (presupuestos, pagos, resúmenes) se ven al abrir la app; se puede enviar a Telegram desde la app a mano |
 | Notificaciones push | Solo las de mercado, y requieren un servicio de envío; se evaluará en la Fase 3 |
@@ -99,7 +99,17 @@ La ruta base es `/Boveda-` (el nombre del repositorio). Los enlaces de Next la a
 - Las APIs de mercado nunca reciben datos tuyos: las consulta GitHub Actions, no tu dispositivo.
 - Los datos en IndexedDB no están cifrados. **Evaluación del 08/11/2026: no se cifran por ahora.** Razones: (1) solo protegería contra alguien que ya tiene tu celular desbloqueado y sabe abrir las herramientas del navegador; (2) si olvidas el PIN perderías también tus respaldos cifrados, y hoy la salida es borrar todo y restaurar; (3) cambiar el PIN obligaría a recifrar todo, con riesgo de perder datos a medio camino. Lo que sí protege: el PIN para abrir la app, que no se dibuje nada mientras está bloqueada y el bloqueo de pantalla de tu celular. Se puede revisar en la Fase 6 junto con el desbloqueo con Face ID.
 
-## 10. Fuentes consultadas (05/11/2026)
+## 10. Fuentes de mercado (verificadas el 08/11/2026)
+
+| Dato | Fuente | Clave | Nota |
+|---|---|---|---|
+| Índices, ETFs, acciones, USD/MXN, DXY, oro, WTI, VIX, bono 10 años | Yahoo Finance (endpoint de gráficas) | No | No oficial; probado desde GitHub Actions el 08/11/2026 |
+| Bitcoin, Ethereum, Solana | Yahoo Finance; respaldo: Coinbase Exchange (API pública) | No | Cambio de 24 horas |
+| FIX, tasa objetivo | Banxico SIE (series SF43718 y SF61745) | Token gratuito `BANXICO_TOKEN` | Banxico pide token en cada consulta |
+| Tasa de la Fed | FRED (serie DFEDTARU) | Clave gratuita `FRED_API_KEY` | |
+| Festivos NYSE | Reglas de la NYSE, comparadas con su calendario oficial 2026–2027 | — | Un cierre extraordinario no se puede prever |
+
+## 11. Fuentes consultadas (05/11/2026)
 
 - GitHub Pages en repositorios públicos con el plan gratuito: <https://help.github.com/articles/what-is-github-pages>
 - Borrado de datos en Safari a los 7 días y excepción de las apps en la pantalla de inicio: <https://searchengineland.com/what-safaris-7-day-cap-on-script-writeable-storage-means-for-pwa-developers-332519> · reporte de borrados: <https://bugs.webkit.org/show_bug.cgi?id=237350>

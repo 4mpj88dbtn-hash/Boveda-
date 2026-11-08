@@ -10,7 +10,7 @@ Estado: ⬜ pendiente · 🟨 en curso · ✅ aprobada
 |---|---|---|---|
 | 0 — Base | Diseño, componentes base, PIN, datos en el dispositivo, respaldos, sin conexión, publicación | App vacía con el diseño, el PIN y la instalación funcionando | ✅ |
 | 1 — Finanzas | Registro rápido, categorías, cuentas, historial, resúmenes semanal y mensual, presupuestos | Ya puedo usarla a diario | ✅ |
-| 2 — Mercados | Watchlist, gráficas, comparador base 100, estado del mercado | Veo todos mis activos clave | ⬜ |
+| 2 — Mercados | Watchlist, gráficas, comparador base 100, estado del mercado | Veo todos mis activos clave | ✅ |
 | 3 — Noticias y señales | Feed, calendario económico, avisos de mercado por Telegram, alertas en la app | Me llegan avisos de mercado al celular | ⬜ |
 | 4 — Inversión S&P 500 | Portafolio, calculadoras, guía educativa, fundamentales | Controlo y entiendo mi inversión | ⬜ |
 | 5 — Trading | Simulador, diario, estadísticas, calculadoras, guías | Practico con método | ⬜ |
@@ -76,18 +76,21 @@ Las secciones citadas (§) se refieren a [`docs/REQUISITOS.md`](docs/REQUISITOS.
 - [x] Cifrado con llave del PIN: evaluado y descartado por ahora (razones en `docs/ARQUITECTURA.md` §9)
 - [x] Base de datos versión 3 y respaldo versión 3, con pruebas de migración
 
-## Fase 2 — Mercados ⬜
+## Fase 2 — Mercados ✅
 
-**Entregable:** veo todos mis activos clave.
+**Entregable:** veo todos mis activos clave. Lista el 08/11/2026.
 
-- Verificar límites y términos vigentes de las fuentes (§3.3); guiar para sacar las claves y guardarlas en los secretos del repositorio
-- Tarea programada en GitHub Actions que baja precios e historial y los publica como JSON con fuente, hora y retraso
-- Watchlist principal fija (§2) + watchlist personal editable
-- Tarjetas con precio, cambio del día en $ y %, mini gráfica y color verde/rojo
-- Gráfica detallada (1D, 5D, 1M, 6M, YTD, 1A, 5A, Máx), de línea y de velas; medias móviles de 50 y 200, RSI, MACD y volumen
-- Comparador "base 100" y rendimientos por periodo con CAGR
-- Estado del mercado con horarios de NYSE en hora de Cancún y días festivos
-- Pruebas: indicadores técnicos, base 100, CAGR y conversión de horarios Nueva York → Cancún
+- [x] Fuentes verificadas el 08/11/2026: Yahoo Finance (sin clave, no oficial) para índices, ETFs, acciones, divisas, materias primas, VIX y bono a 10 años; Coinbase (API pública, sin clave) como respaldo de cripto; Banxico SIE (token gratuito) para FIX y tasa objetivo; FRED (clave gratuita) para la tasa de la Fed
+- [x] Tarea de GitHub Actions cada 20 minutos en horario de mercado y cada 3 horas fuera de él; publica `datos/` junto a la app con fuente, hora y retraso de cada dato; si una fuente falla se conserva el último dato con su hora
+- [x] Watchlist principal fija (§2) + watchlist personal (ETFs, acciones de EE. UU. y México, cripto)
+- [x] Tarjetas con precio, cambio del día en $ y %, mini gráfica y color verde/rojo
+- [x] Gráfica detallada 1D, 5D, 1M, 6M, YTD, 1A, 5A y Máx, de línea y de velas, con MA50, MA200, RSI, MACD y volumen (TradingView Lightweight Charts)
+- [x] Comparador base 100 y rendimientos 1M, 3M, YTD, 1A, 3A, 5A con CAGR
+- [x] Estado del mercado con horarios de NYSE en hora de Cancún, festivos y cierres anticipados
+- [x] Cinta de mercados en el Centro de mando
+- [x] Pruebas: indicadores, base 100, CAGR, rendimientos, horario NYSE → Cancún con festivos, lectura de cada fuente
+- [ ] Tú: guardar `BANXICO_TOKEN` y `FRED_API_KEY` en los secretos del repositorio para FIX, tasa objetivo y tasa de la Fed (pasos en el README)
+- [ ] Tú: fusionar a `main` para que la actualización programada corra sola (GitHub solo programa tareas en la rama principal)
 
 ## Fase 3 — Noticias y señales ⬜
 

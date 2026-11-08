@@ -57,7 +57,19 @@ Tus datos existen solo en ese dispositivo. Si lo pierdes o se borran los datos d
 
 ## Qué claves necesita
 
-Ninguna por ahora. Desde la Fase 2 (precios de mercado) se guardarán claves de las APIs en **Settings → Secrets and variables → Actions** del repositorio; nunca en el código, porque el repositorio es público.
+Los precios de mercado funcionan sin claves (Yahoo Finance y Coinbase). Tres datos necesitan una clave **gratuita**; se guardan en GitHub, nunca en el código (el repositorio es público):
+
+1. En GitHub abre `Boveda-` → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**.
+2. **`BANXICO_TOKEN`** (FIX y tasa objetivo de Banxico): pide el token en https://www.banxico.org.mx/SieAPIRest/service/v1/token.
+3. **`FRED_API_KEY`** (tasa de la Fed): crea una cuenta en https://fred.stlouisfed.org y pide una API key en tu perfil.
+
+La siguiente actualización (máximo 20 minutos en horario de mercado) ya los incluye.
+
+### Datos de mercado
+
+- Una tarea de GitHub Actions (`.github/workflows/mercados.yml`) baja los precios cada 20 minutos en horario de mercado de EE. UU. y cada 3 horas fuera de él, y los publica en `datos/` junto a la app. Tus datos personales nunca salen del dispositivo.
+- La actualización programada solo corre desde la rama `main` (así funciona GitHub). Mientras trabajamos en una rama, los precios se actualizan cada vez que se publica un cambio.
+- Yahoo Finance no tiene una API oficial: puede cambiar o limitar consultas. Si falla, la app muestra el último dato con su hora y se puede cambiar a otra fuente.
 
 ## Correrla en tu computadora
 
@@ -97,6 +109,10 @@ scripts/            preparación del service worker y servidor local
 tests/e2e/          pruebas de flujo completo
 docs/               requisitos, arquitectura y diseño
 ```
+
+## Créditos
+
+- Gráficas: TradingView Lightweight Charts™ — Copyright (c) 2025 TradingView, Inc. — https://www.tradingview.com/ (licencia Apache 2.0).
 
 ## Seguridad
 

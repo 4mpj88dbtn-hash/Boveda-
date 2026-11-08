@@ -41,6 +41,8 @@ const settingSchemas = {
   }),
   /** Hasta cuándo no mostrar el recordatorio de respaldo. */
   backupReminderSnoozedUntil: z.number(),
+  /** Activos extra que sigues en Mercados (ids del catálogo). */
+  watchlist: z.array(z.string().min(1).max(40)).max(40),
 } as const;
 
 export type SettingKey = keyof typeof settingSchemas;
